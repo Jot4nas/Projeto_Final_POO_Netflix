@@ -250,14 +250,9 @@ extras/                  Material de apoio (ver abaixo)
 
 A pasta [`extras/`](extras/) reúne o material de apoio, que não é necessário para rodar o sistema.
 
-**[`extras/contexto/`](extras/contexto/)**
-
-| Arquivo | Conteúdo |
-|---|---|
-| [`Proposta - Trabalho Pratico POO Final.pdf`](extras/contexto/Proposta%20-%20Trabalho%20Pratico%20POO%20Final.pdf) | Enunciado do professor (resumido na seção 1) |
-| [`DOCUMENTACAO.md`](extras/contexto/DOCUMENTACAO.md) | Explicação de cada classe, linha a linha, e o roteiro de testes |
-| [`Obsidian-NetflixPOO.zip`](extras/contexto/Obsidian-NetflixPOO.zip) | Vault do Obsidian com notas de estudo, roteiros de apresentação e perguntas prováveis. Descompacte e abra a pasta como vault (*Open folder as vault*) |
-
-**[`extras/Versão com front-end.zip`](extras/Vers%C3%A3o%20com%20front-end.zip)**
-
-A mesma aplicação, com a mesma lógica (model, DAO, controller e util), mas com a **interface personalizada**: tema escuro, tela Início com destaque e capas dos títulos, e abas de cadastro com visão **Visual** (cartões e avatares) ou **Tabela**. Descompacte, abra `Netflix.jar` e use da mesma forma. Os pôsteres ficam na pasta `capas/`; se uma capa faltar, ela é desenhada em código.
+| Local | Arquivo | Conteúdo |
+|---|---|---|
+| [`extras/contexto/`](extras/contexto/) | [`Proposta - Trabalho Pratico POO Final.pdf`](extras/contexto/Proposta%20-%20Trabalho%20Pratico%20POO%20Final.pdf) | Enunciado do professor (resumido na seção 1) |
+| [`extras/contexto/`](extras/contexto/) | [`DOCUMENTACAO.md`](extras/contexto/DOCUMENTACAO.md) | Explicação de cada classe, linha a linha, e o roteiro de testes |
+| [`extras/contexto/`](extras/contexto/) | [`Obsidian-NetflixPOO.zip`](extras/contexto/Obsidian-NetflixPOO.zip) | Vault do Obsidian com notas de estudo do código. Descompacte e abra a pasta como vault (*Open folder as vault*) |
+| [`extras/`](extras/) | [`Versão com front-end.zip`](extras/Vers%C3%A3o%20com%20front-end.zip) | A mesma aplicação e a mesma lógica (model, DAO, controller e util), com a **interface personalizada**: tema escuro, tela Início com destaque e capas dos títulos, e abas de cadastro com visão **Visual** (cartões e avatares) ou **Tabela**. Descompacte e abra o `Netflix.jar`; os pôsteres ficam em `capas/`, e se uma capa faltar ela é desenhada em código |
