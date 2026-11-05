@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,14 +40,13 @@ import util.ConnectionFactory;
  */
 public class PlanoDAO {
 
-    /** INSERT. O id nao entra: o banco gera (AUTO_INCREMENT) e devolvemos no objeto. */
+    /** INSERT. O id nao entra: o banco gera (AUTO_INCREMENT). */
     public void inserir(Plano p) throws SQLException {
         String sql = "INSERT INTO plano (nome, descricao, valor_mensal, qualidade_maxima, "
                    + "telas_simultaneas, permite_download, data_criacao) VALUES (?, ?, ?, ?, ?, ?, CURDATE())";
 
-        // RETURN_GENERATED_KEYS permite descobrir o id que o banco acabou de gerar.
         try (Connection con = ConnectionFactory.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setString(1, p.getNome());
             ps.setString(2, p.getDescricao());
@@ -58,12 +56,6 @@ public class PlanoDAO {
             ps.setBoolean(6, p.isPermiteDownload());
 
             ps.executeUpdate(); // executeUpdate: INSERT/UPDATE/DELETE (nao retorna tabela)
-
-            try (ResultSet chaves = ps.getGeneratedKeys()) {
-                if (chaves.next()) {
-                    p.setIdPlano(chaves.getInt(1));
-                }
-            }
         }
     }
 

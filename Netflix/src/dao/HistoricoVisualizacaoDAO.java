@@ -5,7 +5,6 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +53,7 @@ public class HistoricoVisualizacaoDAO {
                    + "VALUES (?, ?, NOW(), NOW(), ?, ?, ?)";
 
         try (Connection con = ConnectionFactory.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, h.getIdPerfil());
             ps.setInt(2, h.getIdTitulo());
@@ -63,12 +62,6 @@ public class HistoricoVisualizacaoDAO {
             ps.setString(5, h.getDispositivo());
             // nomePerfil e nomeTitulo NAO sao gravados: nao existem nesta tabela.
             ps.executeUpdate();
-
-            try (ResultSet chaves = ps.getGeneratedKeys()) {
-                if (chaves.next()) {
-                    h.setIdVisualizacao(chaves.getInt(1));
-                }
-            }
         }
     }
 

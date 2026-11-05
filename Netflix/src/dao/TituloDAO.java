@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,16 +23,10 @@ public class TituloDAO {
                    + "VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), ?)";
 
         try (Connection con = ConnectionFactory.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             preencher(ps, t);
             ps.executeUpdate();
-
-            try (ResultSet chaves = ps.getGeneratedKeys()) {
-                if (chaves.next()) {
-                    t.setIdTitulo(chaves.getInt(1));
-                }
-            }
         }
     }
 

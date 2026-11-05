@@ -331,11 +331,10 @@ DAO (Data Access Object) é a **única camada que escreve SQL**. Cada DAO cuida 
 ### 5.2 `PlanoDAO` (referência: os outros seguem o mesmo molde)
 
 **`inserir(Plano p)`**
-- `String sql = "INSERT INTO plano (nome, descricao, valor_mensal, qualidade_maxima, telas_simultaneas, permite_download, data_criacao) VALUES (?, ?, ?, ?, ?, ?, ?)";`: 7 colunas, 7 `?` (o id o banco gera).
-- `try (Connection con = ConnectionFactory.getConnection(); PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS))`: abre a conexão e prepara o comando; `RETURN_GENERATED_KEYS` pede o id gerado.
-- `ps.setString(1, p.getNome())` ... `ps.setDate(7, Date.valueOf(p.getDataCriacao()))`: preenche cada `?` na ordem (`setString` aceita `null` e grava NULL; `setBoolean` vira 0/1).
+- `String sql = "INSERT INTO plano (nome, descricao, valor_mensal, qualidade_maxima, telas_simultaneas, permite_download, data_criacao) VALUES (?, ?, ?, ?, ?, ?, CURDATE())";`: 7 colunas, 6 `?` (o id e a data de criação o banco preenche: `AUTO_INCREMENT` e `CURDATE()`).
+- `try (Connection con = ConnectionFactory.getConnection(); PreparedStatement ps = con.prepareStatement(sql))`: abre a conexão e prepara o comando.
+- `ps.setString(1, p.getNome())` ... `ps.setBoolean(6, p.isPermiteDownload())`: preenche cada `?` na ordem (`setString` aceita `null` e grava NULL; `setBoolean` vira 0/1).
 - `ps.executeUpdate();`: **executa o INSERT**.
-- `try (ResultSet chaves = ps.getGeneratedKeys()) { if (chaves.next()) { p.setIdPlano(chaves.getInt(1)); } }`: lê o id novo e guarda no objeto.
 
 **`listar()`**
 - `SELECT ... FROM plano ORDER BY id_plano`; `List<Plano> lista = new ArrayList<>();`
@@ -633,7 +632,7 @@ O usuário digita Nome `Familia`, Valor `29,90`, Qualidade `HD`, Telas `2` (esco
 1. **View:** `mostrarResultado(inserir())`; `TelaPlano.inserir()` chama `controller.inserir("Familia", "29,90", "HD", "2", "Sim")`.
 2. **Controller (`montar`):** `"Familia"` → `obrigatorio`; `"3"` → `paraInt` (e precisa ser ≥ 1) e, com a qualidade, vira a descrição `gerarDescricao("3", "HD")` = "Duas telas, qualidade HD"; `"29,90"` → `paraDecimal` = 29.90; `"Sim"` → `true`; data → `LocalDate`.
 3. **DAO:** `INSERT INTO plano (...) VALUES (?, ?, ?, ?, ?, ?, ?)` com `setString(1,"Familia")`, `setString(2,"Duas telas, qualidade HD")`, `setBigDecimal(3, 29.90)`, `setString(4,"HD")`, `setInt(5,3)`, `setBoolean(6,true)` → 1, `setDate(7, ...)`.
-4. **Execução:** `executeUpdate()`; o MySQL gera `id_plano = 4`; `getGeneratedKeys()` devolve o 4.
+4. **Execução:** `executeUpdate()`; o MySQL gera `id_plano = 4` (`AUTO_INCREMENT`); o código não precisa desse número de volta.
 5. **Volta:** "Plano inserido com sucesso!" → `JOptionPane` → `recarregar()`.
 
 ### 8.5 Exemplo rastreado: o INNER JOIN do histórico
@@ -893,7 +892,7 @@ Cada aluno responde **2 perguntas de 0,5 ponto**, individualmente, sobre **o có
 |---|---|
 | Por que os atributos são `private`? | Encapsulamento: acesso só por `getX`/`setX`. |
 | Por que dois construtores? | O vazio é usado pelo DAO ao ler do banco; o completo pelo Controller. É sobrecarga. |
-| Por que o construtor completo não recebe o id? | O id é gerado pelo `AUTO_INCREMENT`; o DAO faz `setIdPlano(...)` depois do INSERT. |
+| Por que o construtor completo não recebe o id? | O id é gerado pelo `AUTO_INCREMENT`; quem cria o número é o banco, e o código não precisa dele de volta. |
 | Para que serve o `this`? | Diferencia o atributo (`this.nome`) do parâmetro (`nome`). |
 | O que são `nomePlano`, `emailConta`, `nomePerfil`, `nomeTitulo`? | Campos só de exibição, preenchidos pelos SELECT com JOIN. Não existem nas tabelas e não são gravados. |
 | Por que `Conta` guarda `int idPlano` e não um `Plano`? | Espelha a tabela (só a FK). O nome vem pelo JOIN quando a tela precisa. |
@@ -902,7 +901,7 @@ Cada aluno responde **2 perguntas de 0,5 ponto**, individualmente, sobre **o có
 
 | Pergunta | Resposta |
 |---|---|
-| Explique `PlanoDAO.inserir` linha a linha. | INSERT com 7 `?`; abre `Connection` e `PreparedStatement` no `try`; preenche cada `?` na ordem; `executeUpdate()`; `getGeneratedKeys()` e `setIdPlano(...)`. |
+| Explique `PlanoDAO.inserir` linha a linha. | INSERT com 7 `?`; abre `Connection` e `PreparedStatement` no `try`; preenche cada `?` na ordem; `executeUpdate()`. |
 | Como a descrição do plano é gerada automaticamente? | O Controller tem `gerarDescricao(telas, qualidade)`: converte o número de telas em palavras ("Uma tela", "Duas telas", "Três telas", "Quatro telas"; acima disso "5 telas") e junta com ", qualidade " + a qualidade. Ex.: `("2", "Full HD")` → "Duas telas, qualidade Full HD". |
 | Por que a descrição é gerada no Controller e não na tela? | É regra de negócio (como o texto é montado). A tela só **pede** o texto ao Controller (`controller.gerarDescricao(...)`) para mostrar ao vivo; ao salvar, o próprio Controller gera de novo em `montar(...)`, então a descrição gravada nunca fica diferente das telas e da qualidade. |
 | Como a descrição aparece ao vivo na tela de planos? | `comboQualidade.addActionListener(...)` e `comboTelas.addActionListener(...)` chamam `atualizarDescricao()` sempre que a qualidade ou as telas mudam (inclusive quando o código seleciona o item ao clicar numa linha). O campo de descrição é `setEditable(false)`. |

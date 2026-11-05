@@ -4,7 +4,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +23,7 @@ public class ContaDAO {
                    + "VALUES (?, ?, ?, ?, ?, NOW(), ?)";
 
         try (Connection con = ConnectionFactory.getConnection();
-             PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = con.prepareStatement(sql)) {
 
             ps.setInt(1, c.getIdPlano());
             ps.setString(2, c.getEmail());
@@ -33,12 +32,6 @@ public class ContaDAO {
             ps.setString(5, c.getPais());
             ps.setString(6, c.getStatus());
             ps.executeUpdate();
-
-            try (ResultSet chaves = ps.getGeneratedKeys()) {
-                if (chaves.next()) {
-                    c.setIdConta(chaves.getInt(1));
-                }
-            }
         }
     }
 
