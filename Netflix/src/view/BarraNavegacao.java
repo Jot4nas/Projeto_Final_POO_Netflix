@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 /**
  * Barra do topo, igual em todas as telas: a marca NETFLIX e um botao para cada tela
- * (Inicio, Planos, Contas, Perfis, Titulos, Historico e Relatorio). O botao da tela
+ * (Inicio, Planos, Contas, Perfis, Titulos e Historico). O botao da tela
  * onde o usuario esta fica desabilitado.
  *
  * Cada botao troca de tela pelo Navegador (a tela nova abre no mesmo lugar da atual).
@@ -36,7 +36,6 @@ public class BarraNavegacao extends JPanel {
         esquerda.add(botao("Perfis", atual, e -> Navegador.ir(dona, new TelaPerfil())));
         esquerda.add(botao("Títulos", atual, e -> Navegador.ir(dona, new TelaTitulo())));
         esquerda.add(botao("Histórico", atual, e -> Navegador.ir(dona, new TelaHistorico())));
-        esquerda.add(botao("Relatório", atual, e -> Navegador.ir(dona, new TelaRelatorio())));
         add(esquerda, BorderLayout.WEST);
 
         if (direita != null) {

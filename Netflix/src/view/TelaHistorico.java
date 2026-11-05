@@ -1,6 +1,8 @@
 package view;
 
+import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import controller.HistoricoController;
@@ -71,6 +73,14 @@ public class TelaHistorico extends TelaCrud {
     @Override
     protected String eliminar(String id) {
         return controller.eliminar(id);
+    }
+
+    /** O relatorio e da rotina principal (Historico): o botao fica junto dos demais e abre a TelaRelatorio. */
+    @Override
+    protected void acrescentarBotoes(JPanel painelBotoes) {
+        JButton btnRelatorio = new JButton("Relatório");
+        btnRelatorio.addActionListener(e -> Navegador.ir(this, new TelaRelatorio()));
+        painelBotoes.add(btnRelatorio);
     }
 
     @Override

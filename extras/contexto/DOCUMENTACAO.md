@@ -492,14 +492,14 @@ A View só **captura dados** e **mostra resultados**. Nenhum botão tem SQL ou r
 
 ### 7.4 `TelaPrincipal` (menu)
 
-- Sete `JButton`, numerados na ordem da apresentação: 1. Planos, 2. Contas, 3. Perfis, 4. Títulos, 5. Histórico de Visualização, 6. Relatório, e **Restaurar dados de exemplo**.
+- Seis `JButton`, numerados na ordem da apresentação: 1. Planos, 2. Contas, 3. Perfis, 4. Títulos, 5. Histórico de Visualização, e **Restaurar dados de exemplo**. O Relatório não tem botão no menu: é aberto pelo botão **Relatório** da tela de Histórico.
 - `btnPlanos.addActionListener(e -> Navegador.ir(this, new TelaPlano()));`: cada clique **cria** a tela nova, mostra no mesmo lugar com fade-in e fecha a atual (ver `Navegador` abaixo). A tela se chama **Início** e tem no topo a `BarraNavegacao`, com o botão **Restaurar dados** no canto direito. (Na V1 isso usava `Supplier<JFrame>` e `TelaPlano::new`; agora é direto.)
 - `restaurar()`: pede confirmação (`showConfirmDialog`) e chama `conexaoController.restaurarDadosExemplo()`.
 - `setDefaultCloseOperation(EXIT_ON_CLOSE)`: fechar o menu encerra o programa.
 
 ### 7.4.1 `BarraNavegacao` e `Navegador` (navegação sem janelas empilhadas)
 
-- **`BarraNavegacao`** (`extends JPanel`): a marca NETFLIX e um botão para cada tela (Início, Planos, Contas, Perfis, Títulos, Histórico, Relatório). Aparece no topo de **todas** as telas (`TelaPrincipal`, `TelaCrud`, `TelaRelatorio`); o botão da tela atual fica desabilitado. Cada botão é uma linha: `e -> Navegador.ir(dona, new TelaPlano())`. Só monta a interface, sem SQL (MVC).
+- **`BarraNavegacao`** (`extends JPanel`): a marca NETFLIX e um botão para cada tela (Início, Planos, Contas, Perfis, Títulos, Histórico). Aparece no topo de **todas** as telas (`TelaPrincipal`, `TelaCrud`, `TelaRelatorio`); o botão da tela atual fica desabilitado. Cada botão é uma linha: `e -> Navegador.ir(dona, new TelaPlano())`. Só monta a interface, sem SQL (MVC).
 - **`Navegador.ir(atual, nova)`**: a tela nova abre na **mesma posição e tamanho** da atual (`setBounds`), é mostrada com fade-in e a atual é fechada (`dispose`). Nunca há duas janelas ao mesmo tempo. `Navegador.trocar` é usado só da `TelaConexao` para o menu (abre centralizado).
 - O fade-in é um **véu** (`glass pane` do `JFrame`) com a cor de fundo da tela, pintado por cima do conteúdo; um `javax.swing.Timer` (16 ms) diminui a opacidade em 9 passos (~150 ms) até o véu sumir e a tela voltar a receber cliques.
 - Por que não `Window.setOpacity`? Ele lança `IllegalComponentStateException` em janela com barra de título do Windows.
@@ -806,7 +806,7 @@ Resultado: um único arquivo (~2,6 MB) com nossas classes, o driver e o script S
 5. **Eliminar** a linha criada.
 6. **CASCADE:** em Perfis, elimine **Pedro**; volte ao Histórico: as linhas dele sumiram.
 
-**6. Relatório**
+**6. Relatório** (botão **Relatório** da tela de Histórico)
 1. Abre com o período 2025-01-01 até hoje: as 6 visualizações e os totais.
 2. Período `2025-06-01` a `2025-06-05` → 3 linhas.
 3. Perfil `1 - Ana` → só as visualizações da Ana.

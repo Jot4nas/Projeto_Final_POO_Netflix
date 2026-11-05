@@ -24,7 +24,6 @@ public class TelaPrincipal extends JFrame {
         JButton btnPerfis = new JButton("3. Perfis");
         JButton btnTitulos = new JButton("4. Títulos");
         JButton btnHistorico = new JButton("5. Histórico de Visualização");
-        JButton btnRelatorio = new JButton("6. Relatório: visualizações por período");
         JButton btnRestaurar = new JButton("Restaurar dados");
 
         // Cada clique cria a tela e a mostra. As telas tratam os erros de banco sozinhas.
@@ -33,7 +32,6 @@ public class TelaPrincipal extends JFrame {
         btnPerfis.addActionListener(e -> Navegador.ir(this, new TelaPerfil()));
         btnTitulos.addActionListener(e -> Navegador.ir(this, new TelaTitulo()));
         btnHistorico.addActionListener(e -> Navegador.ir(this, new TelaHistorico()));
-        btnRelatorio.addActionListener(e -> Navegador.ir(this, new TelaRelatorio()));
         btnRestaurar.addActionListener(e -> restaurar());
 
         JPanel painel = new JPanel(new GridLayout(0, 1, 8, 8)); // 1 coluna, um botao por linha
@@ -43,7 +41,6 @@ public class TelaPrincipal extends JFrame {
         painel.add(btnPerfis);
         painel.add(btnTitulos);
         painel.add(btnHistorico);
-        painel.add(btnRelatorio);
 
         // A barra do topo e a mesma de todas as telas; aqui acrescentamos o botao "Restaurar dados" a direita.
         add(new BarraNavegacao(this, "Início", btnRestaurar), BorderLayout.NORTH);

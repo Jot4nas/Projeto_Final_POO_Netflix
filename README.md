@@ -99,7 +99,7 @@ Conexão com o MySQL → Início (menu) → Cadastros → Histórico (rotina pri
 2. **Início:** menu com um botão para cada tela e a opção **Restaurar dados**. Uma barra de navegação no topo aparece em todas as telas, e a troca entre elas acontece na mesma janela, com um fade curto.
 3. **Cadastros:** Planos, Contas, Perfis e Títulos, todos com a mesma tela: formulário, tabela e os botões **Inserir**, **Atualizar**, **Eliminar** e **Limpar**. Clicar numa linha da tabela leva os dados para o formulário.
 4. **Histórico de Visualização:** registra o que cada perfil assistiu. A tabela exibe nomes (perfil, título, conta e plano) em vez de códigos, graças ao JOIN.
-5. **Relatório:** o usuário escolhe data inicial, data final e, se quiser, um perfil; o sistema lista as visualizações do período, mostra o total e permite **salvar em `.txt`**.
+5. **Relatório:** aberto pelo botão **Relatório** da tela de Histórico (ao lado de Inserir, Atualizar, Eliminar e Limpar), onde o usuário escolhe data inicial, data final e, se quiser, um perfil; o sistema lista as visualizações do período, mostra o total e permite **salvar em `.txt`**.
 
 ### Telas
 
@@ -112,7 +112,7 @@ Conexão com o MySQL → Início (menu) → Cadastros → Histórico (rotina pri
 | Perfis | CRUD de perfis; cada perfil pertence a uma conta (com perfil infantil e PIN) |
 | Títulos | CRUD do catálogo (filmes, séries, documentários e stand-ups) |
 | Histórico | CRUD principal: perfil, título, datas, minuto de parada, conclusão e dispositivo |
-| Relatório | Visualizações por período e por perfil, com resumo e exportação |
+| Relatório | Aberto pelo botão **Relatório** do Histórico. Visualizações por período e por perfil, com resumo e exportação |
 
 ### Regras de negócio e validações
 

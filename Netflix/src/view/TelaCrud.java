@@ -83,6 +83,10 @@ public abstract class TelaCrud extends JFrame {
     /** Idem para eliminar. */
     protected abstract String eliminar(String id);
 
+    /** Gancho opcional: a tela filha pode acrescentar botoes proprios ao lado de Inserir, Atualizar, Eliminar e Limpar. */
+    protected void acrescentarBotoes(JPanel painelBotoes) {
+    }
+
     /** Gancho opcional: preenche os combos de chave estrangeira (ex.: lista de planos). */
     protected void carregarCombos() {
     }
@@ -171,6 +175,7 @@ public abstract class TelaCrud extends JFrame {
         painelBotoes.add(btnAtualizar);
         painelBotoes.add(btnEliminar);
         painelBotoes.add(btnLimpar);
+        acrescentarBotoes(painelBotoes);
 
         // Topo: a barra de navegacao (igual em todas as telas) e, embaixo dela, o formulario.
         JPanel topo = new JPanel(new BorderLayout());
