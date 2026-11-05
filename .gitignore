@@ -1,0 +1,8 @@
+# Configuracao local com a senha do MySQL
+config.properties
+
+# Build e arquivos de IDE
+Netflix/build/
+.idea/
+out/
+*.iml
