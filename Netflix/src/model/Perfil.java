@@ -51,9 +51,4 @@ public class Perfil {
 
     public String getEmailConta() { return emailConta; }
     public void setEmailConta(String emailConta) { this.emailConta = emailConta; }
-
-    @Override
-    public String toString() {
-        return nome;
-    }
 }

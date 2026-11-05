@@ -54,11 +54,4 @@ public class Plano {
 
     public boolean isPermiteDownload() { return permiteDownload; }
     public void setPermiteDownload(boolean permiteDownload) { this.permiteDownload = permiteDownload; }
-
-
-    // toString: sobrescreve Object.toString() para o objeto aparecer pelo nome (ex.: ao imprimir).
-    @Override
-    public String toString() {
-        return nome;
-    }
 }

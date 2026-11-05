@@ -287,7 +287,6 @@ Cada classe representa **uma linha** de uma tabela. Só guarda dados: atributos 
 - **Construtor vazio** `public Plano() { }`: usado pelo DAO ao ler do banco (cria vazio e preenche com `setX`).
 - **Construtor completo (sem o id):** usado pelo Controller; `this.nome = nome;` (o `this` diferencia o atributo do parâmetro). O id fica de fora porque o banco gera. Dois construtores com parâmetros diferentes = **sobrecarga**.
 - **Getter** `getX()` (para boolean, `isX()`) e **setter** `setX(valor)`.
-- `@Override public String toString()`: sobrescreve o método herdado de `Object` para o objeto aparecer pelo nome.
 
 ### 4.2 Mapeamento tipo SQL → tipo Java
 
@@ -305,7 +304,7 @@ Cada classe representa **uma linha** de uma tabela. Só guarda dados: atributos 
 
 | Classe | Atributos | Observações |
 |---|---|---|
-| `Plano` | idPlano, nome, descricao, valorMensal (BigDecimal), qualidadeMaxima, telasSimultaneas, permiteDownload (boolean) | `toString()` devolve `nome` |
+| `Plano` | idPlano, nome, descricao, valorMensal (BigDecimal), qualidadeMaxima, telasSimultaneas, permiteDownload (boolean) | |
 | `Conta` | idConta, **idPlano (FK)**, email, senhaHash, telefone (pode ser null), pais, status | **novo:** `nomePlano`, campo **só de exibição** preenchido pelo INNER JOIN do `ContaDAO.listar()` |
 | `Perfil` | idPerfil, **idConta (FK)**, nome, avatar, perfilInfantil, pin | **novo:** `emailConta`, só de exibição (INNER JOIN do `PerfilDAO.listar()`) |
 | `Titulo` | idTitulo, nome, sinopse, tipo, anoLancamento (int), classificacaoIndicativa, **duracaoMinutos (Integer)**, idiomaOriginal, dataAdicaoCatalogo, disponivel | `Integer` porque séries têm duração NULL |
@@ -709,7 +708,7 @@ Boa prática: validar no Controller **antes** de ir ao banco e, mesmo assim, dei
 | **Polimorfismo** | mesma mensagem, comportamentos diferentes | `TelaCrud` chama `inserir()` e roda a versão da tela aberta (9.2) |
 | **Late binding** | método decidido em tempo de execução | a chamada `inserir()` em `TelaCrud` só é resolvida quando a tela roda |
 | **Classe abstrata** | não se instancia; obriga as filhas a implementar | `abstract class TelaCrud` com 4 métodos abstratos |
-| **Sobrescrita (@Override)** | a subclasse redefine um método herdado | `toString()` nos models; `carregarTabela()`, `carregarCombos()`, `definirPadroes()` nas telas; `isCellEditable` |
+| **Sobrescrita (@Override)** | a subclasse redefine um método herdado | `carregarTabela()`, `carregarCombos()`, `definirPadroes()` nas telas; `isCellEditable` |
 | **Sobrecarga** | mesmo nome, parâmetros diferentes | construtores vazio e completo dos models; `definirValor(String, String)` e `definirValor(JComponent, String)` |
 | **Associação e multiplicidade** | ligação com cardinalidade | Plano 1..* Conta; Conta 1..* Perfil; Perfil *..* Título via `HistoricoVisualizacao` |
 | **Agregação ("tem-um")** | uma classe tem outra como parte | `TelaPlano` tem um `PlanoController`, que tem um `PlanoDAO` |

@@ -58,9 +58,4 @@ public class Conta {
 
     public String getNomePlano() { return nomePlano; }
     public void setNomePlano(String nomePlano) { this.nomePlano = nomePlano; }
-
-    @Override
-    public String toString() {
-        return email;
-    }
 }

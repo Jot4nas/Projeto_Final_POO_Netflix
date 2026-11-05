@@ -60,9 +60,4 @@ public class Titulo {
 
     public boolean isDisponivel() { return disponivel; }
     public void setDisponivel(boolean disponivel) { this.disponivel = disponivel; }
-
-    @Override
-    public String toString() {
-        return nome;
-    }
 }
