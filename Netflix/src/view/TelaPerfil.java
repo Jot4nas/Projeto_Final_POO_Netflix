@@ -19,8 +19,7 @@ public class TelaPerfil extends TelaCrud {
 
         adicionarCampo("Conta", comboConta);
         adicionarCampo("Nome", new JTextField());
-        adicionarCampo("Avatar", new JComboBox<>(new String[]{"avatar_azul.png", "avatar_vermelho.png",
-                "avatar_verde.png", "avatar_amarelo.png", "avatar_panda.png"})); // so escolhe, nao digita
+        adicionarCampo("Avatar", new JComboBox<>(new String[]{"azul", "vermelho", "verde", "amarelo"})); // so escolhe, nao digita
         adicionarCampo("Data criação", new JTextField());
         adicionarCampo("Perfil infantil", new JComboBox<>(new String[]{"Nao", "Sim"}));
         adicionarCampo("PIN", new JTextField());

@@ -103,11 +103,11 @@ INSERT INTO conta (id_plano, email, senha_hash, telefone, pais, data_cadastro, s
 (1, 'carla.lima@email.com',  'hash_carla_789', NULL,          'BR', '2025-05-20 09:15:00', 'Suspensa');
 
 INSERT INTO perfil (id_conta, nome, avatar, data_criacao, perfil_infantil, pin) VALUES
-(1, 'Ana',    'avatar_azul.png',     '2025-02-10', 0, '1234'),
-(1, 'Pedro',  'avatar_vermelho.png', '2025-02-11', 0, NULL),
-(1, 'Kids',   'avatar_panda.png',    '2025-02-12', 1, NULL),
-(2, 'Bruno',  'avatar_verde.png',    '2025-03-15', 0, NULL),
-(3, 'Carla',  'avatar_amarelo.png',  '2025-05-20', 0, '4321');
+(1, 'Ana',    'azul',      '2025-02-10', 0, '1234'),
+(1, 'Pedro',  'vermelho',  '2025-02-11', 0, NULL),
+(1, 'Kids',   'amarelo',   '2025-02-12', 1, NULL),
+(2, 'Bruno',  'verde',     '2025-03-15', 0, NULL),
+(3, 'Carla',  'amarelo',   '2025-05-20', 0, '4321');
 
 INSERT INTO titulo (nome, sinopse, tipo, ano_lancamento, classificacao_indicativa, duracao_minutos, idioma_original, data_adicao_catalogo, disponivel) VALUES
 ('Stranger Things',   'Criancas enfrentam forcas sobrenaturais em Hawkins.', 'Serie',        2016, '14', NULL, 'Ingles',    '2024-02-01', 1),
