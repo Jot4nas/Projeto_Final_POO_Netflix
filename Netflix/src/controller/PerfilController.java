@@ -37,10 +37,9 @@ public class PerfilController {
         }
     }
 
-    public String inserir(String conta, String nome, String avatar, String dataCriacao,
-                          String infantil, String pin) {
+    public String inserir(String conta, String nome, String avatar, String infantil, String pin) {
         try {
-            dao.inserir(montar(conta, nome, avatar, dataCriacao, infantil, pin));
+            dao.inserir(montar(conta, nome, avatar, infantil, pin));
             return "Perfil inserido com sucesso!";
         } catch (IllegalArgumentException e) {
             return e.getMessage();
@@ -49,11 +48,10 @@ public class PerfilController {
         }
     }
 
-    public String atualizar(String id, String conta, String nome, String avatar, String dataCriacao,
-                            String infantil, String pin) {
+    public String atualizar(String id, String conta, String nome, String avatar, String infantil, String pin) {
         try {
             int idPerfil = Conversor.paraId(id);
-            Perfil p = montar(conta, nome, avatar, dataCriacao, infantil, pin);
+            Perfil p = montar(conta, nome, avatar, infantil, pin);
             p.setIdPerfil(idPerfil);
             if (!dao.atualizar(p)) {
                 return Conversor.REGISTRO_NAO_ENCONTRADO;
@@ -79,8 +77,7 @@ public class PerfilController {
         }
     }
 
-    private Perfil montar(String conta, String nome, String avatar, String dataCriacao,
-                          String infantil, String pin) {
+    private Perfil montar(String conta, String nome, String avatar, String infantil, String pin) {
         String pinValido = Conversor.vazioParaNulo(pin);
         if (pinValido != null && !pinValido.matches("\\d{4}")) { // regra: PIN opcional, mas com 4 digitos
             throw new IllegalArgumentException("O PIN deve ter exatamente 4 dígitos.");
@@ -89,7 +86,6 @@ public class PerfilController {
                 Conversor.extrairId(conta, "Conta"),
                 Conversor.obrigatorio(nome, "Nome"),
                 Conversor.vazioParaNulo(avatar),
-                Conversor.paraData(dataCriacao, "Data criação"),
                 Conversor.paraBoolean(infantil),
                 pinValido);
     }

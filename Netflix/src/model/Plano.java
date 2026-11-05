@@ -1,7 +1,6 @@
 package model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 /**
  * Entidade Plano (tabela "plano").
@@ -19,7 +18,6 @@ public class Plano {
     private String qualidadeMaxima;   // ENUM('SD','HD','Full HD','4K UHD')
     private int telasSimultaneas;
     private boolean permiteDownload;  // TINYINT(1) = boolean
-    private LocalDate dataCriacao;    // DATE
 
     // Construtor vazio: usado pelo DAO ao montar o objeto a partir do ResultSet.
     public Plano() {
@@ -27,14 +25,13 @@ public class Plano {
 
     // Construtor completo (sem id: o id e gerado pelo AUTO_INCREMENT do banco).
     public Plano(String nome, String descricao, BigDecimal valorMensal, String qualidadeMaxima,
-                 int telasSimultaneas, boolean permiteDownload, LocalDate dataCriacao) {
+                 int telasSimultaneas, boolean permiteDownload) {
         this.nome = nome;
         this.descricao = descricao;
         this.valorMensal = valorMensal;
         this.qualidadeMaxima = qualidadeMaxima;
         this.telasSimultaneas = telasSimultaneas;
         this.permiteDownload = permiteDownload;
-        this.dataCriacao = dataCriacao;
     }
 
     public int getIdPlano() { return idPlano; }
@@ -58,8 +55,6 @@ public class Plano {
     public boolean isPermiteDownload() { return permiteDownload; }
     public void setPermiteDownload(boolean permiteDownload) { this.permiteDownload = permiteDownload; }
 
-    public LocalDate getDataCriacao() { return dataCriacao; }
-    public void setDataCriacao(LocalDate dataCriacao) { this.dataCriacao = dataCriacao; }
 
     // toString: sobrescreve Object.toString() para o objeto aparecer pelo nome (ex.: ao imprimir).
     @Override

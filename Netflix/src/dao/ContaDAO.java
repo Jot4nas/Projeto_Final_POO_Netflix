@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public class ContaDAO {
 
     public void inserir(Conta c) throws SQLException {
         String sql = "INSERT INTO conta (id_plano, email, senha_hash, telefone, pais, data_cadastro, status) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                   + "VALUES (?, ?, ?, ?, ?, NOW(), ?)";
 
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -32,8 +31,7 @@ public class ContaDAO {
             ps.setString(3, c.getSenhaHash());
             ps.setString(4, c.getTelefone()); // setString aceita null -> grava NULL no banco
             ps.setString(5, c.getPais());
-            ps.setTimestamp(6, Timestamp.valueOf(c.getDataCadastro())); // LocalDateTime -> Timestamp
-            ps.setString(7, c.getStatus());
+            ps.setString(6, c.getStatus());
             ps.executeUpdate();
 
             try (ResultSet chaves = ps.getGeneratedKeys()) {
@@ -48,7 +46,7 @@ public class ContaDAO {
         // INNER JOIN com plano: alem do id_plano (FK) trazemos o NOME do plano,
         // para a tela mostrar "3 - Premium" em vez de so "3".
         String sql = "SELECT c.id_conta, c.id_plano, c.email, c.senha_hash, c.telefone, c.pais, "
-                   + "c.data_cadastro, c.status, p.nome AS nome_plano "
+                   + "c.status, p.nome AS nome_plano "
                    + "FROM conta c INNER JOIN plano p ON p.id_plano = c.id_plano "
                    + "ORDER BY c.id_conta";
         List<Conta> lista = new ArrayList<>();
@@ -65,7 +63,6 @@ public class ContaDAO {
                 c.setSenhaHash(rs.getString("senha_hash"));
                 c.setTelefone(rs.getString("telefone")); // NULL do banco vira null no Java
                 c.setPais(rs.getString("pais"));
-                c.setDataCadastro(rs.getTimestamp("data_cadastro").toLocalDateTime());
                 c.setStatus(rs.getString("status"));
                 c.setNomePlano(rs.getString("nome_plano")); // coluna que veio do JOIN
                 lista.add(c);
@@ -76,7 +73,7 @@ public class ContaDAO {
 
     public boolean atualizar(Conta c) throws SQLException {
         String sql = "UPDATE conta SET id_plano = ?, email = ?, senha_hash = ?, telefone = ?, pais = ?, "
-                   + "data_cadastro = ?, status = ? WHERE id_conta = ?";
+                   + "status = ? WHERE id_conta = ?";
 
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -86,9 +83,8 @@ public class ContaDAO {
             ps.setString(3, c.getSenhaHash());
             ps.setString(4, c.getTelefone());
             ps.setString(5, c.getPais());
-            ps.setTimestamp(6, Timestamp.valueOf(c.getDataCadastro()));
-            ps.setString(7, c.getStatus());
-            ps.setInt(8, c.getIdConta());
+            ps.setString(6, c.getStatus());
+            ps.setInt(7, c.getIdConta());
             return ps.executeUpdate() > 0; // false = nenhuma linha com esse id
         }
     }

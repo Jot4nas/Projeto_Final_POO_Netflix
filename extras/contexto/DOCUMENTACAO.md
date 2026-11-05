@@ -150,7 +150,7 @@ plano 1 ---< N conta 1 ---< N perfil N >--- historico_visualizacao ---< N titulo
 - `qualidade_maxima ENUM('SD','HD','Full HD','4K UHD') NOT NULL DEFAULT 'HD'`: só aceita um dos valores listados; padrão `'HD'`.
 - `telas_simultaneas TINYINT NOT NULL DEFAULT 1`: inteiro pequeno.
 - `permite_download TINYINT(1) NOT NULL DEFAULT 0`: o MySQL não tem booleano; `TINYINT(1)` guarda 0 (falso) ou 1 (verdadeiro).
-- `data_criacao DATE NOT NULL`: só a data (aaaa-mm-dd).
+- `data_criacao DATE NOT NULL`: só a data. O Java não preenche: o INSERT usa `CURDATE()`.
 - `) ENGINE=InnoDB;`: InnoDB é o motor que **suporta chaves estrangeiras** e transações.
 
 ### 2.4 Tabela `conta`
@@ -260,18 +260,19 @@ Classes de apoio usadas por várias camadas.
 
 **Para que serve:** a View entrega tudo como texto (`String`). O Controller usa o `Conversor` para transformar em `int`, `BigDecimal`, `LocalDate` etc. e validar. Texto inválido → `IllegalArgumentException` com mensagem em português; o Controller captura e devolve essa mensagem para a tela.
 
-- `DATA_HORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")`: molde de data com hora (ex.: `2025-06-01 20:00`).
+- `DATA = DateTimeFormatter.ofPattern("dd/MM/uuuu")` (com `ResolverStyle.STRICT`, que recusa 31/02): molde da data digitada, no formato brasileiro.
+- `DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm")`: molde de data com hora para **mostrar** (ex.: `01/06/2025 20:00`). Para trocar a ordem, muda só essa linha.
 - `obrigatorio(texto, campo)`: se `texto == null || texto.trim().isEmpty()`, lança "O campo 'X' é obrigatório."; senão devolve `texto.trim()`.
 - `vazioParaNulo(texto)`: operador ternário `condição ? seVerdade : seFalso`. Vazio vira `null` (que o DAO grava como NULL).
 - `paraInt` / `paraIntOuNulo`: `Integer.parseInt`; o `catch (NumberFormatException e)` troca o erro técnico por "deve ser um número inteiro". `paraIntOuNulo` devolve `Integer` (objeto) porque pode ser `null`.
 - `paraDecimal`: `new BigDecimal(texto.replace(',', '.'))`: o usuário digita `29,90` e o `BigDecimal` só entende `29.90`.
-- `paraData` / `paraDataHora`: `LocalDate.parse` (aaaa-mm-dd) e `LocalDateTime.parse(texto, DATA_HORA)`.
+- `paraData`: `LocalDate.parse(texto, DATA)` (dd/mm/aaaa). Só o Relatório pede data digitada.
 - `paraBoolean(texto)`: `"Sim".equals(texto)`; escrito assim (e não `texto.equals("Sim")`) para não dar `NullPointerException` se `texto` for `null`.
 - `simNao(valor)`: boolean → "Sim"/"Nao" para a tabela.
 - **`opcao(int id, String nome)` (novo):** devolve `id + " - " + nome` (ex.: `"3 - Premium"`). É usado **nos combos e nas colunas das tabelas**. Como o texto é idêntico, ao clicar numa linha o combo encontra o mesmo item e se posiciona sozinho.
 - `extrairId(opcao, campo)`: o inverso: `opcao.split(" - ")[0]` pega o `"3"` e converte para `int` (a FK a gravar). Combo vazio → "Selecione um valor em 'Plano'."
 - `paraId(texto)`: id da linha selecionada; vazio → "Selecione um registro na tabela primeiro."
-- `formatarDataHora`, `hoje()`, `agora()`: datas para mostrar e para valores iniciais dos campos.
+- `formatarDataHora` (mostra data e hora nas tabelas e no .txt) e `hoje()` (data final padrão do Relatório).
 
 ---
 
@@ -304,9 +305,9 @@ Cada classe representa **uma linha** de uma tabela. Só guarda dados: atributos 
 
 | Classe | Atributos | Observações |
 |---|---|---|
-| `Plano` | idPlano, nome, descricao, valorMensal (BigDecimal), qualidadeMaxima, telasSimultaneas, permiteDownload (boolean), dataCriacao (LocalDate) | `toString()` devolve `nome` |
-| `Conta` | idConta, **idPlano (FK)**, email, senhaHash, telefone (pode ser null), pais, dataCadastro (LocalDateTime), status | **novo:** `nomePlano`, campo **só de exibição** preenchido pelo INNER JOIN do `ContaDAO.listar()` |
-| `Perfil` | idPerfil, **idConta (FK)**, nome, avatar, dataCriacao, perfilInfantil, pin | **novo:** `emailConta`, só de exibição (INNER JOIN do `PerfilDAO.listar()`) |
+| `Plano` | idPlano, nome, descricao, valorMensal (BigDecimal), qualidadeMaxima, telasSimultaneas, permiteDownload (boolean) | `toString()` devolve `nome` |
+| `Conta` | idConta, **idPlano (FK)**, email, senhaHash, telefone (pode ser null), pais, status | **novo:** `nomePlano`, campo **só de exibição** preenchido pelo INNER JOIN do `ContaDAO.listar()` |
+| `Perfil` | idPerfil, **idConta (FK)**, nome, avatar, perfilInfantil, pin | **novo:** `emailConta`, só de exibição (INNER JOIN do `PerfilDAO.listar()`) |
 | `Titulo` | idTitulo, nome, sinopse, tipo, anoLancamento (int), classificacaoIndicativa, **duracaoMinutos (Integer)**, idiomaOriginal, dataAdicaoCatalogo, disponivel | `Integer` porque séries têm duração NULL |
 | `HistoricoVisualizacao` | idVisualizacao, **idPerfil e idTitulo (FKs)**, dataInicio, dataUltimaVisualizacao, minutoParada, concluido, dispositivo | `nomePerfil`, `nomeTitulo`, `emailConta` e `nomePlano` só de exibição (JOIN). Representa a **tabela associativa** N:N |
 
@@ -413,7 +414,7 @@ Sempre nesta ordem: (1) recebe `String`; (2) valida e converte com o `Conversor`
 
 - `private final PlanoDAO dao = new PlanoDAO();`: o Controller **tem um** DAO (agregação); `final` = a referência não muda.
 - `listar()`: `try { return dao.listar(); } catch (SQLException e) { throw new RuntimeException("Erro ao listar planos: " + ..., e); }`. Como `listar` devolve uma **lista** (não uma mensagem), o erro sobe como `RuntimeException` e a `TelaCrud.recarregar()` mostra.
-- `inserir(String nome, String valorMensal, String qualidadeMaxima, String telas, String permiteDownload, String dataCriacao)`: `dao.inserir(montar(...)); return "Plano inserido com sucesso!";` (não recebe descrição: ela é gerada).
+- `inserir(String nome, String valorMensal, String qualidadeMaxima, String telas, String permiteDownload)`: `dao.inserir(montar(...)); return "Plano inserido com sucesso!";` (não recebe descrição: ela é gerada).
   - `catch (IllegalArgumentException e) { return e.getMessage(); }`: erro de **validação** (Conversor), antes do banco.
   - `catch (SQLException e) { return "Erro no banco de dados: " + e.getMessage(); }`: erro do **banco**, inclusive MySQL desligado (na V2 a `ConnectionFactory` lança `SQLException`).
 - `atualizar(String id, ...)`: `Conversor.paraId(id)` (nada selecionado → mensagem), `montar(...)`, `p.setIdPlano(idPlano)`, `dao.atualizar(p)`.
@@ -435,7 +436,7 @@ Mesmo molde. Diferenças:
 - `listarComNomes()`, `opcoesPerfis()`, `opcoesTitulos()` (formato `"id - nome"`).
 - `inserir`, `atualizar`, `eliminar`: mesmo molde.
 - `montar(...)`: converte as datas e o minuto e aplica **regras de negócio**:
-  - `if (ultima.isBefore(inicio))` → "A última visualização não pode ser anterior ao início."
+  - Início e última visualização **não são digitados**: o `HistoricoVisualizacaoDAO` grava `NOW()` no INSERT (as duas) e só a última no UPDATE.
   - `if (minuto < 0)` → "O minuto de parada não pode ser negativo."
   - `Conversor.extrairId(perfil, "Perfil")` e `extrairId(titulo, "Título")`: as FKs.
 
@@ -557,7 +558,7 @@ Todas têm a mesma estrutura:
 - `carregarCombos()`: `preencherCombo(comboPlano, controller.opcoesPlanos());`.
 - `carregarTabela()`: `for (Plano p : controller.listar()) { modelo.addRow(new Object[]{...}); }`. **É aqui que o `DefaultTableModel` é preenchido.** Colunas de FK usam `Conversor.opcao(id, nome)`.
 - `inserir()` / `atualizar(id)` / `eliminar(id)`: só `return controller.inserir(valor("Nome"), ...);`. Nenhuma lógica.
-- `definirPadroes()`: ex.: `definirValor("Data criação", Conversor.hoje());`.
+- `definirPadroes()`: ex.: `definirValor("País", "BR");`.
 
 | Tela | Combos | Detalhes |
 |---|---|---|
@@ -567,7 +568,7 @@ Todas têm a mesma estrutura:
 | `TelaTitulo` | Tipo, Classificação, Disponível | duração pode ficar vazia (séries) |
 | `TelaHistorico` | **Perfil (FK)**, **Título (FK)**, Concluído, Dispositivo | **CRUD principal**; tabela com o INNER JOIN: "1 - Ana", "1 - Stranger Things" |
 
-**`TelaPlano`: descrição automática.** A descrição não é digitada. A tela guarda o campo de telas (`campoTelas`) e o combo de qualidade (`comboQualidade`) em atributos e liga os dois a `atualizarDescricao()`: o combo com `addActionListener(e -> atualizarDescricao())` e o campo com um `DocumentListener` (avisa quando o texto muda, digitando ou pelo código, por exemplo ao clicar numa linha da tabela). `atualizarDescricao()` chama `controller.gerarDescricao(...)` e coloca o resultado no campo "Descrição (automática)", que é `setEditable(false)`. A regra de como o texto é montado fica no Controller (MVC).
+**`TelaPlano`: descrição automática.** A descrição não é digitada. A tela guarda os dois combos, o de telas simultâneas (`comboTelas`, com 1, 2 e 4) e o de qualidade (`comboQualidade`), em atributos e liga os dois a `atualizarDescricao()` com `addActionListener(e -> atualizarDescricao())` (também dispara quando o código seleciona o valor ao clicar numa linha da tabela). `atualizarDescricao()` chama `controller.gerarDescricao(...)` e coloca o resultado no campo "Descrição (automática)", que é `setEditable(false)`. A regra de como o texto é montado fica no Controller (MVC).
 
 > **O que sumiu da `TelaHistorico` na V2:** as duas colunas escondidas com os IDs e a sobrescrita de `aoSelecionar()`. Elas existiam porque a tabela mostrava só "Ana" e o combo tinha "1 - Ana". Agora os dois mostram "1 - Ana", então o `aoSelecionar()` padrão da `TelaCrud` resolve.
 
@@ -575,7 +576,7 @@ Todas têm a mesma estrutura:
 
 Não herda de `TelaCrud` porque **não é um cadastro**: tem filtros, uma tabela e totais.
 
-- Campos: `campoDataInicial` (padrão `2025-01-01`), `campoDataFinal` (padrão hoje), `comboPerfil` ("Todos" + perfis) e `labelResumo` (totais embaixo).
+- Campos: `campoDataInicial` (padrão `01/01/2025`), `campoDataFinal` (padrão hoje), `comboPerfil` ("Todos" + perfis) e `labelResumo` (totais embaixo).
 - `modelo = new DefaultTableModel(new String[]{"ID", "Início", "Perfil", "Título", "Minuto de parada", "Concluído", "Dispositivo"}, 0) {...}`: tabela só de leitura.
 - `private List<HistoricoVisualizacao> resultado`: guarda o último relatório, usado pelo botão **Salvar .txt**.
 - Botões: `btnGerar.addActionListener(e -> gerar());` e `btnSalvar.addActionListener(e -> salvar());`.
@@ -616,10 +617,8 @@ Não herda de `TelaCrud` porque **não é um cadastro**: tem filtros, uma tabela
 |---|---|---|---|
 | `plano.valor_mensal` | `valorMensal` / BigDecimal | `setBigDecimal` | `getBigDecimal` |
 | `plano.permite_download` | `permiteDownload` / boolean | `setBoolean` | `getBoolean` |
-| `plano.data_criacao` | `dataCriacao` / LocalDate | `setDate(Date.valueOf(...))` | `getDate(...).toLocalDate()` |
 | `conta.id_plano` (FK) | `idPlano` / int | `setInt` | `getInt` |
 | `conta.telefone` | `telefone` / String (null) | `setString` (null → NULL) | `getString` (NULL → null) |
-| `conta.data_cadastro` | `dataCadastro` / LocalDateTime | `setTimestamp(Timestamp.valueOf(...))` | `getTimestamp(...).toLocalDateTime()` |
 | `titulo.duracao_minutos` | `duracaoMinutos` / Integer (null) | `setInt` ou `setNull(i, Types.INTEGER)` | `getInt` + `wasNull()` |
 | (JOIN) `plano.nome AS nome_plano` | `nomePlano` / String | não grava | `getString("nome_plano")` |
 | (JOIN) `perfil.nome AS nome_perfil` | `nomePerfil` / String | não grava | `getString("nome_perfil")` |
@@ -630,11 +629,11 @@ No `PreparedStatement` o primeiro parâmetro é a **posição do `?`** (começa 
 
 ### 8.4 Exemplo rastreado: INSERIR um plano
 
-O usuário digita Nome `Familia`, Valor `29,90`, Qualidade `HD`, Telas `3`, Download `Sim`, Data `2026-10-24` e clica em **Inserir**. (A Descrição não é digitada: a tela mostra "Três telas, qualidade HD", gerada pelo Controller.)
+O usuário digita Nome `Familia`, Valor `29,90`, Qualidade `HD`, Telas `2` (escolhida na lista 1, 2 ou 4), Download `Sim` e clica em **Inserir**. (A Descrição não é digitada: a tela mostra "Duas telas, qualidade HD", gerada pelo Controller.)
 
-1. **View:** `mostrarResultado(inserir())`; `TelaPlano.inserir()` chama `controller.inserir("Familia", "29,90", "HD", "3", "Sim", "2026-10-24")`.
-2. **Controller (`montar`):** `"Familia"` → `obrigatorio`; `"3"` → `paraInt` (e precisa ser ≥ 1) e, com a qualidade, vira a descrição `gerarDescricao("3", "HD")` = "Três telas, qualidade HD"; `"29,90"` → `paraDecimal` = 29.90; `"Sim"` → `true`; data → `LocalDate`.
-3. **DAO:** `INSERT INTO plano (...) VALUES (?, ?, ?, ?, ?, ?, ?)` com `setString(1,"Familia")`, `setString(2,"Três telas, qualidade HD")`, `setBigDecimal(3, 29.90)`, `setString(4,"HD")`, `setInt(5,3)`, `setBoolean(6,true)` → 1, `setDate(7, ...)`.
+1. **View:** `mostrarResultado(inserir())`; `TelaPlano.inserir()` chama `controller.inserir("Familia", "29,90", "HD", "2", "Sim")`.
+2. **Controller (`montar`):** `"Familia"` → `obrigatorio`; `"3"` → `paraInt` (e precisa ser ≥ 1) e, com a qualidade, vira a descrição `gerarDescricao("3", "HD")` = "Duas telas, qualidade HD"; `"29,90"` → `paraDecimal` = 29.90; `"Sim"` → `true`; data → `LocalDate`.
+3. **DAO:** `INSERT INTO plano (...) VALUES (?, ?, ?, ?, ?, ?, ?)` com `setString(1,"Familia")`, `setString(2,"Duas telas, qualidade HD")`, `setBigDecimal(3, 29.90)`, `setString(4,"HD")`, `setInt(5,3)`, `setBoolean(6,true)` → 1, `setDate(7, ...)`.
 4. **Execução:** `executeUpdate()`; o MySQL gera `id_plano = 4`; `getGeneratedKeys()` devolve o 4.
 5. **Volta:** "Plano inserido com sucesso!" → `JOptionPane` → `recarregar()`.
 
@@ -650,8 +649,8 @@ O DAO cria o objeto com `setNomePerfil("Ana")` e `setNomeTitulo("Stranger Things
 
 ### 8.6 Exemplo rastreado: o RELATÓRIO
 
-Filtro: 2025-06-01 a 2025-06-05, perfil "Todos".
-1. `TelaRelatorio.gerar()` → `RelatorioController.gerar("2025-06-01", "2025-06-05", "Todos")`.
+Filtro: 01/06/2025 a 05/06/2025, perfil "Todos".
+1. `TelaRelatorio.gerar()` → `RelatorioController.gerar("01/06/2025", "05/06/2025", "Todos")`.
 2. Controller: converte as datas, confere que a final não é anterior à inicial, `idPerfil = 0`.
 3. DAO: `SELECT_COM_NOMES + "WHERE DATE(h.data_inicio) BETWEEN ? AND ? ORDER BY h.data_inicio"` (sem o filtro de perfil, porque é 0).
 4. Resultado: 3 visualizações (Ana/Stranger Things, Ana/Ainda Estou Aqui, Pedro/Round 6).
@@ -778,7 +777,7 @@ Resultado: um único arquivo (~2,6 MB) com nossas classes, o driver e o script S
 
 **1. Planos**
 1. **Listar:** ao abrir, aparecem Basico, Padrao e Premium.
-2. **Inserir:** Nome `Familia`, Valor `29,90`, Qualidade `HD`, Telas `3`, Download `Sim` → "Plano inserido com sucesso!".
+2. **Inserir:** Nome `Familia`, Valor `29,90`, Qualidade `HD`, Telas `2`, Download `Sim` → "Plano inserido com sucesso!".
 3. **Atualizar:** clique na linha Familia, mude o valor para `34,90` → Atualizar.
 4. **Eliminar:** selecione Familia → Eliminar → Sim.
 5. **FK:** tente eliminar **Premium** (tem conta) → "Não foi possível eliminar...".
@@ -802,13 +801,13 @@ Resultado: um único arquivo (~2,6 MB) com nossas classes, o driver e o script S
 1. Colunas Perfil e Título mostram **"1 - Ana"** e **"1 - Stranger Things"** (INNER JOIN).
 2. **Inserir:** Perfil `3 - Kids`, Título `3 - Our Planet`, Minuto `30`, Dispositivo `Tablet`.
 3. **Atualizar:** clique na linha; os combos se posicionam sozinhos. Mude Minuto para `45`, Concluído `Sim`.
-4. **Regra:** Última visualização antes do Início → erro.
+4. **Datas automáticas:** Início e Última visualização não são digitadas; aparecem na tabela já preenchidas pelo banco (data e hora de agora).
 5. **Eliminar** a linha criada.
 6. **CASCADE:** em Perfis, elimine **Pedro**; volte ao Histórico: as linhas dele sumiram.
 
 **6. Relatório** (botão **Relatório** da tela de Histórico)
-1. Abre com o período 2025-01-01 até hoje: as 6 visualizações e os totais.
-2. Período `2025-06-01` a `2025-06-05` → 3 linhas.
+1. Abre com o período 01/01/2025 até hoje: as 6 visualizações e os totais.
+2. Período `01/06/2025` a `05/06/2025` → 3 linhas.
 3. Perfil `1 - Ana` → só as visualizações da Ana.
 4. Data final antes da inicial → erro de validação.
 5. **Salvar .txt** → escolha onde salvar e abra o arquivo.
@@ -837,7 +836,7 @@ Resultado: um único arquivo (~2,6 MB) com nossas classes, o driver e o script S
 | "Não foi possível conectar ao MySQL" | MySQL desligado (Serviços do Windows → MySQL80 → Iniciar) ou senha errada |
 | Quero voltar aos dados originais | Menu → **Restaurar dados de exemplo** |
 | Quero trocar a senha salva | A tela de conexão aparece sempre ao abrir; ou apague o `config.properties` |
-| Erro de data | Datas: `aaaa-mm-dd`; data com hora: `aaaa-mm-dd hh:mm` |
+| Erro de data | Só o Relatório pede data: `dd/mm/aaaa` (ex.: 31/12/2026) |
 | Mudei o código e nada mudou | Rode `Netflix/build.bat` para gerar o jar de novo |
 
 ---
@@ -907,7 +906,7 @@ Cada aluno responde **2 perguntas de 0,5 ponto**, individualmente, sobre **o có
 | Explique `PlanoDAO.inserir` linha a linha. | INSERT com 7 `?`; abre `Connection` e `PreparedStatement` no `try`; preenche cada `?` na ordem; `executeUpdate()`; `getGeneratedKeys()` e `setIdPlano(...)`. |
 | Como a descrição do plano é gerada automaticamente? | O Controller tem `gerarDescricao(telas, qualidade)`: converte o número de telas em palavras ("Uma tela", "Duas telas", "Três telas", "Quatro telas"; acima disso "5 telas") e junta com ", qualidade " + a qualidade. Ex.: `("2", "Full HD")` → "Duas telas, qualidade Full HD". |
 | Por que a descrição é gerada no Controller e não na tela? | É regra de negócio (como o texto é montado). A tela só **pede** o texto ao Controller (`controller.gerarDescricao(...)`) para mostrar ao vivo; ao salvar, o próprio Controller gera de novo em `montar(...)`, então a descrição gravada nunca fica diferente das telas e da qualidade. |
-| Como a descrição aparece ao vivo na tela de planos? | `comboQualidade.addActionListener(...)` e um `DocumentListener` no campo de telas chamam `atualizarDescricao()` sempre que a qualidade ou o texto de telas muda (inclusive quando o código preenche o campo ao clicar numa linha). O campo de descrição é `setEditable(false)`. |
+| Como a descrição aparece ao vivo na tela de planos? | `comboQualidade.addActionListener(...)` e `comboTelas.addActionListener(...)` chamam `atualizarDescricao()` sempre que a qualidade ou as telas mudam (inclusive quando o código seleciona o item ao clicar numa linha). O campo de descrição é `setEditable(false)`. |
 | E se o UPDATE/DELETE ficar sem `WHERE`? | Alteraria/apagaria **todos** os registros. |
 | Por que `PreparedStatement`? | Previne SQL Injection: comando e dados vão separados. |
 | O que é o try-with-resources? | Fecha `ps` e `con` automaticamente ao sair do bloco, mesmo com erro. |

@@ -1,6 +1,5 @@
 package model;
 
-import java.time.LocalDate;
 
 /**
  * Entidade Titulo (tabela "titulo"): um item do catalogo (filme, serie...).
@@ -16,7 +15,6 @@ public class Titulo {
     private String classificacaoIndicativa;  // ENUM('L','10','12','14','16','18')
     private Integer duracaoMinutos;          // Integer (objeto) porque pode ser NULL em series
     private String idiomaOriginal;
-    private LocalDate dataAdicaoCatalogo;    // DATE
     private boolean disponivel;              // TINYINT(1)
 
     public Titulo() {
@@ -24,7 +22,7 @@ public class Titulo {
 
     public Titulo(String nome, String sinopse, String tipo, int anoLancamento,
                   String classificacaoIndicativa, Integer duracaoMinutos, String idiomaOriginal,
-                  LocalDate dataAdicaoCatalogo, boolean disponivel) {
+                  boolean disponivel) {
         this.nome = nome;
         this.sinopse = sinopse;
         this.tipo = tipo;
@@ -32,7 +30,6 @@ public class Titulo {
         this.classificacaoIndicativa = classificacaoIndicativa;
         this.duracaoMinutos = duracaoMinutos;
         this.idiomaOriginal = idiomaOriginal;
-        this.dataAdicaoCatalogo = dataAdicaoCatalogo;
         this.disponivel = disponivel;
     }
 
@@ -60,8 +57,6 @@ public class Titulo {
     public String getIdiomaOriginal() { return idiomaOriginal; }
     public void setIdiomaOriginal(String idiomaOriginal) { this.idiomaOriginal = idiomaOriginal; }
 
-    public LocalDate getDataAdicaoCatalogo() { return dataAdicaoCatalogo; }
-    public void setDataAdicaoCatalogo(LocalDate dataAdicaoCatalogo) { this.dataAdicaoCatalogo = dataAdicaoCatalogo; }
 
     public boolean isDisponivel() { return disponivel; }
     public void setDisponivel(boolean disponivel) { this.disponivel = disponivel; }

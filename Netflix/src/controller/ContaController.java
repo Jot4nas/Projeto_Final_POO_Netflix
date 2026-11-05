@@ -38,9 +38,9 @@ public class ContaController {
     }
 
     public String inserir(String plano, String email, String senha, String telefone,
-                          String pais, String dataCadastro, String status) {
+                          String pais, String status) {
         try {
-            dao.inserir(montar(plano, email, senha, telefone, pais, dataCadastro, status));
+            dao.inserir(montar(plano, email, senha, telefone, pais, status));
             return "Conta inserida com sucesso!";
         } catch (IllegalArgumentException e) {
             return e.getMessage();
@@ -50,10 +50,10 @@ public class ContaController {
     }
 
     public String atualizar(String id, String plano, String email, String senha, String telefone,
-                            String pais, String dataCadastro, String status) {
+                            String pais, String status) {
         try {
             int idConta = Conversor.paraId(id);
-            Conta c = montar(plano, email, senha, telefone, pais, dataCadastro, status);
+            Conta c = montar(plano, email, senha, telefone, pais, status);
             c.setIdConta(idConta);
             if (!dao.atualizar(c)) {
                 return Conversor.REGISTRO_NAO_ENCONTRADO;
@@ -98,7 +98,7 @@ public class ContaController {
     }
 
     private Conta montar(String plano, String email, String senha, String telefone,
-                         String pais, String dataCadastro, String status) {
+                         String pais, String status) {
         String paisValido = Conversor.obrigatorio(pais, "País");
         if (paisValido.length() != 2) { // regra de negocio: codigo do pais tem 2 letras (CHAR(2))
             throw new IllegalArgumentException("O país deve ter 2 letras (ex.: BR).");
@@ -109,7 +109,6 @@ public class ContaController {
                 Conversor.obrigatorio(senha, "Senha"), // em um sistema real aqui geraria o hash da senha
                 Conversor.vazioParaNulo(telefone),
                 paisValido.toUpperCase(),
-                Conversor.paraDataHora(dataCadastro, "Data cadastro"),
                 status);
     }
 }

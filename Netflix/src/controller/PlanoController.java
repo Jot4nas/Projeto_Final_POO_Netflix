@@ -37,9 +37,9 @@ public class PlanoController {
     }
 
     public String inserir(String nome, String valorMensal, String qualidadeMaxima,
-                          String telas, String permiteDownload, String dataCriacao) {
+                          String telas, String permiteDownload) {
         try {
-            dao.inserir(montar(nome, valorMensal, qualidadeMaxima, telas, permiteDownload, dataCriacao));
+            dao.inserir(montar(nome, valorMensal, qualidadeMaxima, telas, permiteDownload));
             return "Plano inserido com sucesso!";
         } catch (IllegalArgumentException e) { // erro de validacao (Conversor)
             return e.getMessage();
@@ -49,10 +49,10 @@ public class PlanoController {
     }
 
     public String atualizar(String id, String nome, String valorMensal, String qualidadeMaxima,
-                            String telas, String permiteDownload, String dataCriacao) {
+                            String telas, String permiteDownload) {
         try {
             int idPlano = Conversor.paraId(id);
-            Plano p = montar(nome, valorMensal, qualidadeMaxima, telas, permiteDownload, dataCriacao);
+            Plano p = montar(nome, valorMensal, qualidadeMaxima, telas, permiteDownload);
             p.setIdPlano(idPlano);
             if (!dao.atualizar(p)) {
                 return Conversor.REGISTRO_NAO_ENCONTRADO;
@@ -108,7 +108,7 @@ public class PlanoController {
 
     /** Monta o Model a partir dos textos; reaproveitado por inserir e atualizar. */
     private Plano montar(String nome, String valorMensal, String qualidadeMaxima,
-                         String telas, String permiteDownload, String dataCriacao) {
+                         String telas, String permiteDownload) {
         BigDecimal valor = Conversor.paraDecimal(valorMensal, "Valor mensal");
         if (valor.signum() <= 0) { // regra: um plano precisa custar mais que zero
             throw new IllegalArgumentException("O valor mensal deve ser maior que zero.");
@@ -123,7 +123,6 @@ public class PlanoController {
                 valor,
                 qualidadeMaxima,
                 quantidadeTelas,
-                Conversor.paraBoolean(permiteDownload),
-                Conversor.paraData(dataCriacao, "Data criação"));
+                Conversor.paraBoolean(permiteDownload));
     }
 }

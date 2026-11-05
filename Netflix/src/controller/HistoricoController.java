@@ -1,7 +1,6 @@
 package controller;
 
 import java.sql.SQLException;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,10 +66,9 @@ public class HistoricoController {
         }
     }
 
-    public String inserir(String perfil, String titulo, String dataInicio, String dataUltima,
-                          String minutoParada, String concluido, String dispositivo) {
+    public String inserir(String perfil, String titulo, String minutoParada, String concluido, String dispositivo) {
         try {
-            dao.inserir(montar(perfil, titulo, dataInicio, dataUltima, minutoParada, concluido, dispositivo));
+            dao.inserir(montar(perfil, titulo, minutoParada, concluido, dispositivo));
             return "Visualização registrada com sucesso!";
         } catch (IllegalArgumentException e) {
             return e.getMessage();
@@ -79,11 +77,10 @@ public class HistoricoController {
         }
     }
 
-    public String atualizar(String id, String perfil, String titulo, String dataInicio, String dataUltima,
-                            String minutoParada, String concluido, String dispositivo) {
+    public String atualizar(String id, String perfil, String titulo, String minutoParada, String concluido, String dispositivo) {
         try {
             int idVisualizacao = Conversor.paraId(id);
-            HistoricoVisualizacao h = montar(perfil, titulo, dataInicio, dataUltima, minutoParada, concluido, dispositivo);
+            HistoricoVisualizacao h = montar(perfil, titulo, minutoParada, concluido, dispositivo);
             h.setIdVisualizacao(idVisualizacao);
             if (!dao.atualizar(h)) {
                 return Conversor.REGISTRO_NAO_ENCONTRADO;
@@ -109,18 +106,12 @@ public class HistoricoController {
         }
     }
 
-    private HistoricoVisualizacao montar(String perfil, String titulo, String dataInicio, String dataUltima,
-                                         String minutoParada, String concluido, String dispositivo)
+    private HistoricoVisualizacao montar(String perfil, String titulo, String minutoParada, String concluido, String dispositivo)
             throws SQLException {
-        LocalDateTime inicio = Conversor.paraDataHora(dataInicio, "Início");
-        LocalDateTime ultima = Conversor.paraDataHora(dataUltima, "Última visualização");
         int minuto = Conversor.paraInt(minutoParada, "Minuto de parada");
         int idTitulo = Conversor.extrairId(titulo, "Título");
 
         // Regras de negocio (ficam no Controller, nunca na View):
-        if (ultima.isBefore(inicio)) {
-            throw new IllegalArgumentException("A última visualização não pode ser anterior ao início.");
-        }
         if (minuto < 0) {
             throw new IllegalArgumentException("O minuto de parada não pode ser negativo.");
         }
@@ -132,7 +123,7 @@ public class HistoricoController {
         return new HistoricoVisualizacao(
                 Conversor.extrairId(perfil, "Perfil"),
                 idTitulo,
-                inicio, ultima, minuto,
+                minuto,
                 Conversor.paraBoolean(concluido),
                 dispositivo);
     }

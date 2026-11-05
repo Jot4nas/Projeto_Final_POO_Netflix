@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,18 +51,16 @@ public class HistoricoVisualizacaoDAO {
     public void inserir(HistoricoVisualizacao h) throws SQLException {
         String sql = "INSERT INTO historico_visualizacao (id_perfil, id_titulo, data_inicio, "
                    + "data_ultima_visualizacao, minuto_parada, concluido, dispositivo) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                   + "VALUES (?, ?, NOW(), NOW(), ?, ?, ?)";
 
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setInt(1, h.getIdPerfil());
             ps.setInt(2, h.getIdTitulo());
-            ps.setTimestamp(3, Timestamp.valueOf(h.getDataInicio()));
-            ps.setTimestamp(4, Timestamp.valueOf(h.getDataUltimaVisualizacao()));
-            ps.setInt(5, h.getMinutoParada());
-            ps.setBoolean(6, h.isConcluido());
-            ps.setString(7, h.getDispositivo());
+            ps.setInt(3, h.getMinutoParada());
+            ps.setBoolean(4, h.isConcluido());
+            ps.setString(5, h.getDispositivo());
             // nomePerfil e nomeTitulo NAO sao gravados: nao existem nesta tabela.
             ps.executeUpdate();
 
@@ -127,8 +124,8 @@ public class HistoricoVisualizacaoDAO {
 
     /** UPDATE: altera o registro identificado pelo id (WHERE). Sem o WHERE, todas as linhas seriam alteradas. */
     public boolean atualizar(HistoricoVisualizacao h) throws SQLException {
-        String sql = "UPDATE historico_visualizacao SET id_perfil = ?, id_titulo = ?, data_inicio = ?, "
-                   + "data_ultima_visualizacao = ?, minuto_parada = ?, concluido = ?, dispositivo = ? "
+        String sql = "UPDATE historico_visualizacao SET id_perfil = ?, id_titulo = ?, "
+                   + "data_ultima_visualizacao = NOW(), minuto_parada = ?, concluido = ?, dispositivo = ? "
                    + "WHERE id_visualizacao = ?";
 
         try (Connection con = ConnectionFactory.getConnection();
@@ -136,12 +133,10 @@ public class HistoricoVisualizacaoDAO {
 
             ps.setInt(1, h.getIdPerfil());
             ps.setInt(2, h.getIdTitulo());
-            ps.setTimestamp(3, Timestamp.valueOf(h.getDataInicio()));
-            ps.setTimestamp(4, Timestamp.valueOf(h.getDataUltimaVisualizacao()));
-            ps.setInt(5, h.getMinutoParada());
-            ps.setBoolean(6, h.isConcluido());
-            ps.setString(7, h.getDispositivo());
-            ps.setInt(8, h.getIdVisualizacao()); // o "?" do WHERE
+            ps.setInt(3, h.getMinutoParada());
+            ps.setBoolean(4, h.isConcluido());
+            ps.setString(5, h.getDispositivo());
+            ps.setInt(6, h.getIdVisualizacao()); // o "?" do WHERE
             return ps.executeUpdate() > 0; // false = nenhuma linha com esse id
         }
     }

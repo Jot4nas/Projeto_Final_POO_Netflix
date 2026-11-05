@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 import java.time.format.DateTimeParseException;
 
 /**
@@ -14,7 +15,11 @@ import java.time.format.DateTimeParseException;
  */
 public class Conversor {
 
-    private static final DateTimeFormatter DATA_HORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    // Formato brasileiro. STRICT recusa datas que nao existem (ex.: 31/02/2026).
+    private static final DateTimeFormatter DATA = DateTimeFormatter.ofPattern("dd/MM/uuuu")
+            .withResolverStyle(ResolverStyle.STRICT);
+    // Data e hora que o sistema MOSTRA (tabelas e relatorio). Para trocar a ordem, mude so esta linha.
+    private static final DateTimeFormatter DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     /** Resposta quando UPDATE/DELETE nao encontra o id (ex.: o registro foi eliminado em outra janela). */
     public static final String REGISTRO_NAO_ENCONTRADO =
@@ -59,17 +64,9 @@ public class Conversor {
 
     public static LocalDate paraData(String texto, String campo) {
         try {
-            return LocalDate.parse(obrigatorio(texto, campo));
+            return LocalDate.parse(obrigatorio(texto, campo), DATA);
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("O campo '" + campo + "' deve estar no formato aaaa-mm-dd.");
-        }
-    }
-
-    public static LocalDateTime paraDataHora(String texto, String campo) {
-        try {
-            return LocalDateTime.parse(obrigatorio(texto, campo), DATA_HORA);
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("O campo '" + campo + "' deve estar no formato aaaa-mm-dd hh:mm.");
+            throw new IllegalArgumentException("O campo '" + campo + "' deve ser uma data válida no formato dd/mm/aaaa (ex.: 31/12/2026).");
         }
     }
 
@@ -115,10 +112,7 @@ public class Conversor {
     }
 
     public static String hoje() {
-        return LocalDate.now().toString();
+        return LocalDate.now().format(DATA);
     }
 
-    public static String agora() {
-        return formatarDataHora(LocalDateTime.now());
-    }
 }

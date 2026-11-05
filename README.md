@@ -121,8 +121,8 @@ As regras ficam no **Controller** (e na conversão de textos em `util/Conversor`
 - Valor mensal do plano maior que zero e pelo menos 1 tela simultânea.
 - E-mail da conta único, país com 2 letras e plano existente.
 - PIN do perfil com exatamente 4 dígitos.
-- Datas no formato `aaaa-mm-dd` (e `aaaa-mm-dd hh:mm` no histórico).
-- Última visualização não pode ser anterior ao início; o minuto de parada não pode ser negativo nem passar da duração do título (séries não têm duração e ficam com `NULL`).
+- Datas em formato brasileiro (`dd/mm/aaaa`); só o relatório pede data. As datas de cadastro e as do histórico (início e última visualização) são gravadas pelo próprio MySQL.
+- O minuto de parada não pode ser negativo nem passar da duração do título (séries não têm duração e ficam com `NULL`).
 - No relatório, a data final não pode ser anterior à inicial.
 
 ### Integridade dos dados

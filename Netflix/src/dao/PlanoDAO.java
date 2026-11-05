@@ -1,7 +1,6 @@
 package dao;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -45,7 +44,7 @@ public class PlanoDAO {
     /** INSERT. O id nao entra: o banco gera (AUTO_INCREMENT) e devolvemos no objeto. */
     public void inserir(Plano p) throws SQLException {
         String sql = "INSERT INTO plano (nome, descricao, valor_mensal, qualidade_maxima, "
-                   + "telas_simultaneas, permite_download, data_criacao) VALUES (?, ?, ?, ?, ?, ?, ?)";
+                   + "telas_simultaneas, permite_download, data_criacao) VALUES (?, ?, ?, ?, ?, ?, CURDATE())";
 
         // RETURN_GENERATED_KEYS permite descobrir o id que o banco acabou de gerar.
         try (Connection con = ConnectionFactory.getConnection();
@@ -57,7 +56,6 @@ public class PlanoDAO {
             ps.setString(4, p.getQualidadeMaxima());
             ps.setInt(5, p.getTelasSimultaneas());
             ps.setBoolean(6, p.isPermiteDownload());
-            ps.setDate(7, Date.valueOf(p.getDataCriacao())); // LocalDate -> java.sql.Date
 
             ps.executeUpdate(); // executeUpdate: INSERT/UPDATE/DELETE (nao retorna tabela)
 
@@ -72,7 +70,7 @@ public class PlanoDAO {
     /** SELECT * : devolve todos os planos como lista de objetos Plano. */
     public List<Plano> listar() throws SQLException {
         String sql = "SELECT id_plano, nome, descricao, valor_mensal, qualidade_maxima, "
-                   + "telas_simultaneas, permite_download, data_criacao FROM plano ORDER BY id_plano";
+                   + "telas_simultaneas, permite_download FROM plano ORDER BY id_plano";
         List<Plano> lista = new ArrayList<>();
 
         try (Connection con = ConnectionFactory.getConnection();
@@ -90,7 +88,7 @@ public class PlanoDAO {
     /** UPDATE: altera todos os campos do plano identificado pelo id (clausula WHERE). */
     public boolean atualizar(Plano p) throws SQLException {
         String sql = "UPDATE plano SET nome = ?, descricao = ?, valor_mensal = ?, qualidade_maxima = ?, "
-                   + "telas_simultaneas = ?, permite_download = ?, data_criacao = ? WHERE id_plano = ?";
+                   + "telas_simultaneas = ?, permite_download = ? WHERE id_plano = ?";
 
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -101,8 +99,7 @@ public class PlanoDAO {
             ps.setString(4, p.getQualidadeMaxima());
             ps.setInt(5, p.getTelasSimultaneas());
             ps.setBoolean(6, p.isPermiteDownload());
-            ps.setDate(7, Date.valueOf(p.getDataCriacao()));
-            ps.setInt(8, p.getIdPlano()); // sem o WHERE, TODOS os planos seriam alterados!
+            ps.setInt(7, p.getIdPlano()); // sem o WHERE, TODOS os planos seriam alterados!
 
             return ps.executeUpdate() > 0; // false = nenhuma linha com esse id
         }
@@ -135,7 +132,6 @@ public class PlanoDAO {
         p.setQualidadeMaxima(rs.getString("qualidade_maxima"));
         p.setTelasSimultaneas(rs.getInt("telas_simultaneas"));
         p.setPermiteDownload(rs.getBoolean("permite_download"));
-        p.setDataCriacao(rs.getDate("data_criacao").toLocalDate()); // java.sql.Date -> LocalDate
         return p;
     }
 }

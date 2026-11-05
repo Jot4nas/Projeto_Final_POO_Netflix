@@ -14,7 +14,7 @@ public class TelaTitulo extends TelaCrud {
 
     public TelaTitulo() {
         super("Títulos", new String[]{"ID", "Nome", "Sinopse", "Tipo", "Ano lançamento", "Classificação",
-                "Duração (min)", "Idioma original", "Data adição", "Disponível"});
+                "Duração (min)", "Idioma original", "Disponível"});
 
         adicionarCampo("Nome", new JTextField());
         adicionarCampo("Sinopse", new JTextField());
@@ -23,7 +23,6 @@ public class TelaTitulo extends TelaCrud {
         adicionarCampo("Classificação", new JComboBox<>(new String[]{"L", "10", "12", "14", "16", "18"}));
         adicionarCampo("Duração (min)", new JTextField());
         adicionarCampo("Idioma original", new JTextField());
-        adicionarCampo("Data adição", new JTextField());
         adicionarCampo("Disponível", new JComboBox<>(new String[]{"Sim", "Nao"}));
         iniciar();
     }
@@ -33,7 +32,7 @@ public class TelaTitulo extends TelaCrud {
         for (Titulo t : controller.listar()) {
             modelo.addRow(new Object[]{t.getIdTitulo(), t.getNome(), t.getSinopse(), t.getTipo(),
                     t.getAnoLancamento(), t.getClassificacaoIndicativa(), t.getDuracaoMinutos(),
-                    t.getIdiomaOriginal(), t.getDataAdicaoCatalogo(), Conversor.simNao(t.isDisponivel())});
+                    t.getIdiomaOriginal(), Conversor.simNao(t.isDisponivel())});
         }
     }
 
@@ -41,14 +40,14 @@ public class TelaTitulo extends TelaCrud {
     protected String inserir() {
         return controller.inserir(valor("Nome"), valor("Sinopse"), valor("Tipo"), valor("Ano lançamento"),
                 valor("Classificação"), valor("Duração (min)"), valor("Idioma original"),
-                valor("Data adição"), valor("Disponível"));
+                valor("Disponível"));
     }
 
     @Override
     protected String atualizar(String id) {
         return controller.atualizar(id, valor("Nome"), valor("Sinopse"), valor("Tipo"), valor("Ano lançamento"),
                 valor("Classificação"), valor("Duração (min)"), valor("Idioma original"),
-                valor("Data adição"), valor("Disponível"));
+                valor("Disponível"));
     }
 
     @Override
@@ -56,8 +55,4 @@ public class TelaTitulo extends TelaCrud {
         return controller.eliminar(id);
     }
 
-    @Override
-    protected void definirPadroes() {
-        definirValor("Data adição", Conversor.hoje());
-    }
 }

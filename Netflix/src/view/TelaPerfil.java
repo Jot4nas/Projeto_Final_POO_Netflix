@@ -14,13 +14,11 @@ public class TelaPerfil extends TelaCrud {
     private final JComboBox<String> comboConta = new JComboBox<>();
 
     public TelaPerfil() {
-        super("Perfis", new String[]{"ID", "Conta", "Nome", "Avatar", "Data criação",
-                "Perfil infantil", "PIN"});
+        super("Perfis", new String[]{"ID", "Conta", "Nome", "Avatar", "Perfil infantil", "PIN"});
 
         adicionarCampo("Conta", comboConta);
         adicionarCampo("Nome", new JTextField());
         adicionarCampo("Avatar", new JComboBox<>(new String[]{"azul", "vermelho", "verde", "amarelo"})); // so escolhe, nao digita
-        adicionarCampo("Data criação", new JTextField());
         adicionarCampo("Perfil infantil", new JComboBox<>(new String[]{"Nao", "Sim"}));
         adicionarCampo("PIN", new JTextField());
         iniciar();
@@ -36,21 +34,19 @@ public class TelaPerfil extends TelaCrud {
     protected void carregarTabela() {
         for (Perfil p : controller.listar()) {
             modelo.addRow(new Object[]{p.getIdPerfil(), Conversor.opcao(p.getIdConta(), p.getEmailConta()),
-                    p.getNome(), p.getAvatar(), p.getDataCriacao(), Conversor.simNao(p.isPerfilInfantil()),
+                    p.getNome(), p.getAvatar(), Conversor.simNao(p.isPerfilInfantil()),
                     p.getPin()});
         }
     }
 
     @Override
     protected String inserir() {
-        return controller.inserir(valor("Conta"), valor("Nome"), valor("Avatar"), valor("Data criação"),
-                valor("Perfil infantil"), valor("PIN"));
+        return controller.inserir(valor("Conta"), valor("Nome"), valor("Avatar"), valor("Perfil infantil"), valor("PIN"));
     }
 
     @Override
     protected String atualizar(String id) {
-        return controller.atualizar(id, valor("Conta"), valor("Nome"), valor("Avatar"), valor("Data criação"),
-                valor("Perfil infantil"), valor("PIN"));
+        return controller.atualizar(id, valor("Conta"), valor("Nome"), valor("Avatar"), valor("Perfil infantil"), valor("PIN"));
     }
 
     @Override
@@ -58,8 +54,4 @@ public class TelaPerfil extends TelaCrud {
         return controller.eliminar(id);
     }
 
-    @Override
-    protected void definirPadroes() {
-        definirValor("Data criação", Conversor.hoje());
-    }
 }

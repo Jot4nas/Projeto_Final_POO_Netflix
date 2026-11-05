@@ -32,13 +32,10 @@ public class HistoricoVisualizacao {
     public HistoricoVisualizacao() {
     }
 
-    public HistoricoVisualizacao(int idPerfil, int idTitulo, LocalDateTime dataInicio,
-                                 LocalDateTime dataUltimaVisualizacao, int minutoParada,
+    public HistoricoVisualizacao(int idPerfil, int idTitulo, int minutoParada,
                                  boolean concluido, String dispositivo) {
         this.idPerfil = idPerfil;
         this.idTitulo = idTitulo;
-        this.dataInicio = dataInicio;
-        this.dataUltimaVisualizacao = dataUltimaVisualizacao;
         this.minutoParada = minutoParada;
         this.concluido = concluido;
         this.dispositivo = dispositivo;

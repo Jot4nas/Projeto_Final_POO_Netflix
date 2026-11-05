@@ -21,9 +21,9 @@ public class TituloController {
     }
 
     public String inserir(String nome, String sinopse, String tipo, String ano, String classificacao,
-                          String duracao, String idioma, String dataAdicao, String disponivel) {
+                          String duracao, String idioma, String disponivel) {
         try {
-            dao.inserir(montar(nome, sinopse, tipo, ano, classificacao, duracao, idioma, dataAdicao, disponivel));
+            dao.inserir(montar(nome, sinopse, tipo, ano, classificacao, duracao, idioma, disponivel));
             return "Título inserido com sucesso!";
         } catch (IllegalArgumentException e) {
             return e.getMessage();
@@ -33,10 +33,10 @@ public class TituloController {
     }
 
     public String atualizar(String id, String nome, String sinopse, String tipo, String ano, String classificacao,
-                            String duracao, String idioma, String dataAdicao, String disponivel) {
+                            String duracao, String idioma, String disponivel) {
         try {
             int idTitulo = Conversor.paraId(id);
-            Titulo t = montar(nome, sinopse, tipo, ano, classificacao, duracao, idioma, dataAdicao, disponivel);
+            Titulo t = montar(nome, sinopse, tipo, ano, classificacao, duracao, idioma, disponivel);
             t.setIdTitulo(idTitulo);
             if (!dao.atualizar(t)) {
                 return Conversor.REGISTRO_NAO_ENCONTRADO;
@@ -63,7 +63,7 @@ public class TituloController {
     }
 
     private Titulo montar(String nome, String sinopse, String tipo, String ano, String classificacao,
-                          String duracao, String idioma, String dataAdicao, String disponivel) {
+                          String duracao, String idioma, String disponivel) {
         return new Titulo(
                 Conversor.obrigatorio(nome, "Nome"),
                 Conversor.vazioParaNulo(sinopse),
@@ -72,7 +72,6 @@ public class TituloController {
                 classificacao,
                 Conversor.paraIntOuNulo(duracao, "Duração (min)"), // vazio -> null (series)
                 Conversor.vazioParaNulo(idioma),
-                Conversor.paraData(dataAdicao, "Data adição"),
                 Conversor.paraBoolean(disponivel));
     }
 }

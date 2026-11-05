@@ -1,7 +1,6 @@
 package dao;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,7 +18,7 @@ public class PerfilDAO {
 
     public void inserir(Perfil p) throws SQLException {
         String sql = "INSERT INTO perfil (id_conta, nome, avatar, data_criacao, perfil_infantil, pin) "
-                   + "VALUES (?, ?, ?, ?, ?, ?)";
+                   + "VALUES (?, ?, ?, CURDATE(), ?, ?)";
 
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -27,9 +26,8 @@ public class PerfilDAO {
             ps.setInt(1, p.getIdConta());
             ps.setString(2, p.getNome());
             ps.setString(3, p.getAvatar());
-            ps.setDate(4, Date.valueOf(p.getDataCriacao()));
-            ps.setBoolean(5, p.isPerfilInfantil());
-            ps.setString(6, p.getPin()); // pin e opcional (null -> NULL)
+            ps.setBoolean(4, p.isPerfilInfantil());
+            ps.setString(5, p.getPin()); // pin e opcional (null -> NULL)
             ps.executeUpdate();
 
             try (ResultSet chaves = ps.getGeneratedKeys()) {
@@ -42,7 +40,7 @@ public class PerfilDAO {
 
     public List<Perfil> listar() throws SQLException {
         // INNER JOIN com conta: traz tambem o e-mail da conta dona do perfil.
-        String sql = "SELECT p.id_perfil, p.id_conta, p.nome, p.avatar, p.data_criacao, p.perfil_infantil, "
+        String sql = "SELECT p.id_perfil, p.id_conta, p.nome, p.avatar, p.perfil_infantil, "
                    + "p.pin, c.email AS email_conta "
                    + "FROM perfil p INNER JOIN conta c ON c.id_conta = p.id_conta "
                    + "ORDER BY p.id_perfil";
@@ -58,7 +56,6 @@ public class PerfilDAO {
                 p.setIdConta(rs.getInt("id_conta"));
                 p.setNome(rs.getString("nome"));
                 p.setAvatar(rs.getString("avatar"));
-                p.setDataCriacao(rs.getDate("data_criacao").toLocalDate());
                 p.setPerfilInfantil(rs.getBoolean("perfil_infantil"));
                 p.setPin(rs.getString("pin"));
                 p.setEmailConta(rs.getString("email_conta")); // coluna que veio do JOIN
@@ -69,7 +66,7 @@ public class PerfilDAO {
     }
 
     public boolean atualizar(Perfil p) throws SQLException {
-        String sql = "UPDATE perfil SET id_conta = ?, nome = ?, avatar = ?, data_criacao = ?, "
+        String sql = "UPDATE perfil SET id_conta = ?, nome = ?, avatar = ?, "
                    + "perfil_infantil = ?, pin = ? WHERE id_perfil = ?";
 
         try (Connection con = ConnectionFactory.getConnection();
@@ -78,10 +75,9 @@ public class PerfilDAO {
             ps.setInt(1, p.getIdConta());
             ps.setString(2, p.getNome());
             ps.setString(3, p.getAvatar());
-            ps.setDate(4, Date.valueOf(p.getDataCriacao()));
-            ps.setBoolean(5, p.isPerfilInfantil());
-            ps.setString(6, p.getPin());
-            ps.setInt(7, p.getIdPerfil());
+            ps.setBoolean(4, p.isPerfilInfantil());
+            ps.setString(5, p.getPin());
+            ps.setInt(6, p.getIdPerfil());
             return ps.executeUpdate() > 0; // false = nenhuma linha com esse id
         }
     }

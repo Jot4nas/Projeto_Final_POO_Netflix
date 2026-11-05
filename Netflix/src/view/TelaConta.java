@@ -15,14 +15,13 @@ public class TelaConta extends TelaCrud {
 
     public TelaConta() {
         super("Contas", new String[]{"ID", "Plano", "E-mail", "Senha", "Telefone", "País",
-                "Data cadastro", "Status"});
+                "Status"});
 
         adicionarCampo("Plano", comboPlano);
         adicionarCampo("E-mail", new JTextField());
         adicionarCampo("Senha", new JTextField());
         adicionarCampo("Telefone", new JTextField());
         adicionarCampo("País", new JTextField());
-        adicionarCampo("Data cadastro", new JTextField());
         adicionarCampo("Status", new JComboBox<>(new String[]{"Ativa", "Suspensa", "Cancelada"}));
         iniciar();
     }
@@ -38,20 +37,20 @@ public class TelaConta extends TelaCrud {
         for (Conta c : controller.listar()) {
             modelo.addRow(new Object[]{c.getIdConta(), Conversor.opcao(c.getIdPlano(), c.getNomePlano()),
                     c.getEmail(), c.getSenhaHash(), c.getTelefone(), c.getPais(),
-                    Conversor.formatarDataHora(c.getDataCadastro()), c.getStatus()});
+                    c.getStatus()});
         }
     }
 
     @Override
     protected String inserir() {
         return controller.inserir(valor("Plano"), valor("E-mail"), valor("Senha"), valor("Telefone"),
-                valor("País"), valor("Data cadastro"), valor("Status"));
+                valor("País"), valor("Status"));
     }
 
     @Override
     protected String atualizar(String id) {
         return controller.atualizar(id, valor("Plano"), valor("E-mail"), valor("Senha"), valor("Telefone"),
-                valor("País"), valor("Data cadastro"), valor("Status"));
+                valor("País"), valor("Status"));
     }
 
     @Override
@@ -62,6 +61,5 @@ public class TelaConta extends TelaCrud {
     @Override
     protected void definirPadroes() {
         definirValor("País", "BR");
-        definirValor("Data cadastro", Conversor.agora());
     }
 }

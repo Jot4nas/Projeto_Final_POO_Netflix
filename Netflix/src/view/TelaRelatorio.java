@@ -33,7 +33,7 @@ public class TelaRelatorio extends JFrame {
 
     private final RelatorioController controller = new RelatorioController();
 
-    private final JTextField campoDataInicial = new JTextField("2025-01-01", 10);
+    private final JTextField campoDataInicial = new JTextField("01/01/2025", 10);
     private final JTextField campoDataFinal = new JTextField(Conversor.hoje(), 10);
     private final JComboBox<String> comboPerfil = new JComboBox<>();
     private final JLabel labelResumo = new JLabel(" ");
@@ -63,7 +63,7 @@ public class TelaRelatorio extends JFrame {
         btnSalvar.addActionListener(e -> salvar());
 
         JPanel painelFiltros = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        painelFiltros.add(new JLabel("Data inicial (aaaa-mm-dd):"));
+        painelFiltros.add(new JLabel("Data inicial (dd/mm/aaaa):"));
         painelFiltros.add(campoDataInicial);
         painelFiltros.add(new JLabel("Data final:"));
         painelFiltros.add(campoDataFinal);

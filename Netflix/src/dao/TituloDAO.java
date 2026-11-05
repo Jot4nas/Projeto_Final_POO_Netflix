@@ -1,7 +1,6 @@
 package dao;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -22,7 +21,7 @@ public class TituloDAO {
     public void inserir(Titulo t) throws SQLException {
         String sql = "INSERT INTO titulo (nome, sinopse, tipo, ano_lancamento, classificacao_indicativa, "
                    + "duracao_minutos, idioma_original, data_adicao_catalogo, disponivel) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), ?)";
 
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -40,7 +39,7 @@ public class TituloDAO {
 
     public List<Titulo> listar() throws SQLException {
         String sql = "SELECT id_titulo, nome, sinopse, tipo, ano_lancamento, classificacao_indicativa, "
-                   + "duracao_minutos, idioma_original, data_adicao_catalogo, disponivel "
+                   + "duracao_minutos, idioma_original, disponivel "
                    + "FROM titulo ORDER BY id_titulo";
         List<Titulo> lista = new ArrayList<>();
 
@@ -63,7 +62,6 @@ public class TituloDAO {
                 t.setDuracaoMinutos(rs.wasNull() ? null : duracao);
 
                 t.setIdiomaOriginal(rs.getString("idioma_original"));
-                t.setDataAdicaoCatalogo(rs.getDate("data_adicao_catalogo").toLocalDate());
                 t.setDisponivel(rs.getBoolean("disponivel"));
                 lista.add(t);
             }
@@ -74,13 +72,13 @@ public class TituloDAO {
     public boolean atualizar(Titulo t) throws SQLException {
         String sql = "UPDATE titulo SET nome = ?, sinopse = ?, tipo = ?, ano_lancamento = ?, "
                    + "classificacao_indicativa = ?, duracao_minutos = ?, idioma_original = ?, "
-                   + "data_adicao_catalogo = ?, disponivel = ? WHERE id_titulo = ?";
+                   + "disponivel = ? WHERE id_titulo = ?";
 
         try (Connection con = ConnectionFactory.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
 
             preencher(ps, t);
-            ps.setInt(10, t.getIdTitulo());
+            ps.setInt(9, t.getIdTitulo());
             return ps.executeUpdate() > 0; // false = nenhuma linha com esse id
         }
     }
@@ -113,7 +111,6 @@ public class TituloDAO {
         }
 
         ps.setString(7, t.getIdiomaOriginal());
-        ps.setDate(8, Date.valueOf(t.getDataAdicaoCatalogo()));
-        ps.setBoolean(9, t.isDisponivel());
+        ps.setBoolean(8, t.isDisponivel());
     }
 }

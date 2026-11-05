@@ -1,6 +1,5 @@
 package model;
 
-import java.time.LocalDateTime;
 
 /**
  * Entidade Conta (tabela "conta").
@@ -16,7 +15,6 @@ public class Conta {
     private String senhaHash;        // senha_hash
     private String telefone;         // pode ser NULL no banco
     private String pais;             // CHAR(2), ex.: "BR"
-    private LocalDateTime dataCadastro; // DATETIME
     private String status;           // ENUM('Ativa','Suspensa','Cancelada')
 
     // Campo so de EXIBICAO (nao existe na tabela conta): preenchido pelo INNER JOIN
@@ -27,13 +25,12 @@ public class Conta {
     }
 
     public Conta(int idPlano, String email, String senhaHash, String telefone,
-                 String pais, LocalDateTime dataCadastro, String status) {
+                 String pais, String status) {
         this.idPlano = idPlano;
         this.email = email;
         this.senhaHash = senhaHash;
         this.telefone = telefone;
         this.pais = pais;
-        this.dataCadastro = dataCadastro;
         this.status = status;
     }
 
@@ -55,8 +52,6 @@ public class Conta {
     public String getPais() { return pais; }
     public void setPais(String pais) { this.pais = pais; }
 
-    public LocalDateTime getDataCadastro() { return dataCadastro; }
-    public void setDataCadastro(LocalDateTime dataCadastro) { this.dataCadastro = dataCadastro; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
