@@ -21,9 +21,9 @@ public class Conversor {
     // Data e hora que o sistema MOSTRA (tabelas e relatorio). Para trocar a ordem, mude so esta linha.
     private static final DateTimeFormatter DATA_HORA = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
-    /** Resposta quando UPDATE/DELETE nao encontra o id (ex.: o registro foi eliminado em outra janela). */
+    /** Resposta quando UPDATE/DELETE nao encontra o id (ex.: o registro foi removido em outra janela). */
     public static final String REGISTRO_NAO_ENCONTRADO =
-            "Registro não encontrado (ele pode ter sido eliminado em outra janela). A tabela foi atualizada.";
+            "Registro não encontrado (ele pode ter sido removido em outra janela). A tabela foi atualizada.";
 
     private Conversor() {
     }

@@ -54,7 +54,7 @@ public class TituloController {
             if (!dao.eliminar(Conversor.paraId(id))) {
                 return Conversor.REGISTRO_NAO_ENCONTRADO;
             }
-            return "Título eliminado com sucesso (o histórico dele também foi apagado).";
+            return "Título removido com sucesso (o histórico dele também foi apagado).";
         } catch (IllegalArgumentException e) {
             return e.getMessage();
         } catch (SQLException e) {

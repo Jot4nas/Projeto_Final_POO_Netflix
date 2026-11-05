@@ -98,7 +98,7 @@ public class HistoricoController {
             if (!dao.eliminar(Conversor.paraId(id))) {
                 return Conversor.REGISTRO_NAO_ENCONTRADO;
             }
-            return "Registro eliminado com sucesso!";
+            return "Registro removido com sucesso!";
         } catch (IllegalArgumentException e) {
             return e.getMessage();
         } catch (SQLException e) {

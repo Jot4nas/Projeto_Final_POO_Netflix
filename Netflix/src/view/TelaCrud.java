@@ -83,7 +83,7 @@ public abstract class TelaCrud extends JFrame {
     /** Idem para eliminar. */
     protected abstract String eliminar(String id);
 
-    /** Gancho opcional: a tela filha pode acrescentar botoes proprios ao lado de Inserir, Atualizar, Eliminar e Limpar. */
+    /** Gancho opcional: a tela filha pode acrescentar botoes proprios ao lado de Inserir, Atualizar, Remover e Limpar. */
     protected void acrescentarBotoes(JPanel painelBotoes) {
     }
 
@@ -147,7 +147,7 @@ public abstract class TelaCrud extends JFrame {
 
         JButton btnInserir = new JButton("Inserir");
         JButton btnAtualizar = new JButton("Atualizar");
-        JButton btnEliminar = new JButton("Eliminar");
+        JButton btnEliminar = new JButton("Remover");
         JButton btnLimpar = new JButton("Limpar");
 
         /*
@@ -213,7 +213,7 @@ public abstract class TelaCrud extends JFrame {
             mostrarResultado(eliminar(""));
             return;
         }
-        int resposta = JOptionPane.showConfirmDialog(this, "Eliminar o registro selecionado?",
+        int resposta = JOptionPane.showConfirmDialog(this, "Remover o registro selecionado?",
                 "Confirmação", JOptionPane.YES_NO_OPTION);
         if (resposta == JOptionPane.YES_OPTION) {
             mostrarResultado(eliminar(idSelecionado()));

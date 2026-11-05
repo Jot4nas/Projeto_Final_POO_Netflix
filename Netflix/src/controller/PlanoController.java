@@ -70,14 +70,14 @@ public class PlanoController {
             if (!dao.eliminar(Conversor.paraId(id))) {
                 return Conversor.REGISTRO_NAO_ENCONTRADO;
             }
-            return "Plano eliminado com sucesso!";
+            return "Plano removido com sucesso!";
         } catch (IllegalArgumentException e) {
             return e.getMessage();
         } catch (SQLException e) {
             // 1451 = o MySQL recusou porque ha contas usando este plano (chave estrangeira).
             if (e.getErrorCode() == 1451) {
-                return "Não é possível eliminar este plano: há contas que usam ele. "
-                        + "Troque o plano dessas contas (ou elimine-as) antes.";
+                return "Não é possível remover este plano: há contas que usam ele. "
+                        + "Troque o plano dessas contas (ou remova-as) antes.";
             }
             return "Erro no banco de dados: " + e.getMessage();
         }

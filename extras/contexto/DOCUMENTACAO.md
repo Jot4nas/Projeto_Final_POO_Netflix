@@ -416,7 +416,7 @@ Sempre nesta ordem: (1) recebe `String`; (2) valida e converte com o `Conversor`
   - `catch (IllegalArgumentException e) { return e.getMessage(); }`: erro de **validação** (Conversor), antes do banco.
   - `catch (SQLException e) { return "Erro no banco de dados: " + e.getMessage(); }`: erro do **banco**, inclusive MySQL desligado (na V2 a `ConnectionFactory` lança `SQLException`).
 - `atualizar(String id, ...)`: `Conversor.paraId(id)` (nada selecionado → mensagem), `montar(...)`, `p.setIdPlano(idPlano)`, `dao.atualizar(p)`.
-- `eliminar(String id)`: se a FK impedir, devolve "Não foi possível eliminar (o plano pode estar em uso por uma conta)".
+- `eliminar(String id)`: se a FK impedir, devolve "Não foi possível remover (o plano pode estar em uso por uma conta)".
 - `gerarDescricao(String telas, String qualidadeMaxima)` (público): **regra de negócio**. Converte `telas` em `int` (se for inválido ou menor que 1, devolve `""`), escolhe o texto do número (`"Uma tela"`, `"Duas telas"`, `"Três telas"`, `"Quatro telas"` ou `n + " telas"`) e devolve `telasTexto + ", qualidade " + qualidadeMaxima`. É chamado pela tela (para mostrar ao vivo) e por `montar(...)` (para gravar).
 - `montar(...)` (privado): valida `telas >= 1` ("O plano precisa ter pelo menos 1 tela simultânea.") e cria `new Plano(Conversor.obrigatorio(nome, "Nome"), gerarDescricao(telas, qualidadeMaxima), Conversor.paraDecimal(...), qualidadeMaxima, quantidadeTelas, Conversor.paraBoolean(...), Conversor.paraData(...))`.
 
@@ -665,7 +665,7 @@ MySQL recusa (ou está desligado) -> SQLException
 
 | O que o usuário faz | Quem recusa | Mensagem |
 |---|---|---|
-| Eliminar um plano que tem contas | MySQL (FK) | "Não foi possível eliminar (o plano pode estar em uso...)" |
+| Remover um plano que tem contas | MySQL (FK) | "Não foi possível remover (o plano pode estar em uso...)" |
 | Conta com e-mail repetido | MySQL (UNIQUE) | "Erro no banco de dados (e-mail já cadastrado?)..." |
 | Nome vazio | Controller (`Conversor.obrigatorio`), antes do banco | "O campo 'Nome' é obrigatório." |
 | `abc` no Ano | Controller (`Conversor.paraInt`) | "O campo 'Ano lançamento' deve ser um número inteiro." |
@@ -777,8 +777,8 @@ Resultado: um único arquivo (~2,6 MB) com nossas classes, o driver e o script S
 1. **Listar:** ao abrir, aparecem Basico, Padrao e Premium.
 2. **Inserir:** Nome `Familia`, Valor `29,90`, Qualidade `HD`, Telas `2`, Download `Sim` → "Plano inserido com sucesso!".
 3. **Atualizar:** clique na linha Familia, mude o valor para `34,90` → Atualizar.
-4. **Eliminar:** selecione Familia → Eliminar → Sim.
-5. **FK:** tente eliminar **Premium** (tem conta) → "Não foi possível eliminar...".
+4. **Remover:** selecione Familia → Remover → Sim.
+5. **FK:** tente eliminar **Premium** (tem conta) → "Não foi possível remover...".
 
 **2. Contas**
 1. Coluna **Plano** mostra "3 - Premium" (INNER JOIN), não só "3".
@@ -800,7 +800,7 @@ Resultado: um único arquivo (~2,6 MB) com nossas classes, o driver e o script S
 2. **Inserir:** Perfil `3 - Kids`, Título `3 - Our Planet`, Minuto `30`, Dispositivo `Tablet`.
 3. **Atualizar:** clique na linha; os combos se posicionam sozinhos. Mude Minuto para `45`, Concluído `Sim`.
 4. **Datas automáticas:** Início e Última visualização não são digitadas; aparecem na tabela já preenchidas pelo banco (data e hora de agora).
-5. **Eliminar** a linha criada.
+5. **Remover** a linha criada.
 6. **CASCADE:** em Perfis, elimine **Pedro**; volte ao Histórico: as linhas dele sumiram.
 
 **6. Relatório** (botão **Relatório** da tela de Histórico)
@@ -816,14 +816,14 @@ Resultado: um único arquivo (~2,6 MB) com nossas classes, o driver e o script S
 |---|---|
 | Conectar e o menu abrir | JDBC + criação automática do banco |
 | Listar ao abrir | `SELECT` + `ResultSet` → objetos → `DefaultTableModel` |
-| Inserir / Atualizar / Eliminar | `PreparedStatement` com INSERT, UPDATE e DELETE |
+| Inserir / Atualizar / Remover | `PreparedStatement` com INSERT, UPDATE e DELETE |
 | "3 - Premium" na tabela de Contas | INNER JOIN conta + plano |
-| Eliminar plano em uso | integridade referencial (FK) |
+| Remover plano em uso | integridade referencial (FK) |
 | E-mail repetido | restrição `UNIQUE` |
 | País com 3 letras, PIN com 2 dígitos, datas trocadas | regras de negócio no Controller |
 | Série sem duração | tratamento de NULL (`Integer`, `setNull`, `wasNull`) |
 | Histórico com nomes | INNER JOIN com 5 tabelas (histórico, perfil, título, conta e plano); a tabela mostra também as colunas Conta e Plano |
-| Eliminar perfil e o histórico sumir | `ON DELETE CASCADE` |
+| Remover perfil e o histórico sumir | `ON DELETE CASCADE` |
 | Relatório por período / perfil + totais + .txt | relatório da rotina principal |
 
 ### 11.5 Problemas comuns
@@ -863,7 +863,7 @@ Cada aluno responde **2 perguntas de 0,5 ponto**, individualmente, sobre **o có
 | Por que a ordem plano, conta, perfil, titulo, historico? | Uma tabela só pode referenciar (FK) outra que já existe. Os INSERT seguem a mesma ordem. |
 | Quais são as PKs e FKs? | 5 PKs (`id_plano`, `id_conta`, `id_perfil`, `id_titulo`, `id_visualizacao`) e 4 FKs: `conta.id_plano`, `perfil.id_conta`, `historico_visualizacao.id_perfil` e `.id_titulo`. |
 | Qual tabela é associativa? | `historico_visualizacao`: resolve o N:N entre perfil e título e guarda dados da sessão. |
-| O que acontece ao apagar o plano Premium? | A FK sem CASCADE impede (há conta usando); a `SQLException` vira "Não foi possível eliminar...". |
+| O que acontece ao apagar o plano Premium? | A FK sem CASCADE impede (há conta usando); a `SQLException` vira "Não foi possível remover...". |
 | O que acontece ao apagar o perfil Pedro? | `ON DELETE CASCADE` apaga junto o histórico dele. |
 | Por que CASCADE só no histórico? | Histórico sem perfil/título não faz sentido; nos outros preferimos **bloquear** para não apagar dados sem querer. |
 | Por que `DECIMAL(6,2)` e `BigDecimal`? | Dinheiro precisa de decimal exato; FLOAT/double arredondam. |
@@ -982,10 +982,10 @@ Uma revisão "adversarial" (que tenta quebrar o sistema) achou 9 falhas (a de va
 | 4 | Num computador com outro fuso horário os horários apareciam deslocados (20:00 virava 23:00) | `connectionTimeZone=LOCAL` na URL: o horário digitado é o mostrado em qualquer fuso | `ConnectionFactory.montarUrl` |
 | 5 | Um banco `netflix` já existente mas **vazio** nunca recebia as tabelas | Se o banco não existe ou está sem tabelas, é criado. Banco com tabelas continua sendo reaproveitado (nunca apagado) | `CriadorBanco.criarSeNaoExistir`, `bancoSemTabelas` |
 | 6 | Plano com valor negativo ou zero era aceito | "O valor mensal deve ser maior que zero." | `PlanoController.montar` |
-| 7 | Eliminar/atualizar um registro que já não existe dizia "sucesso" | Os DAOs devolvem `true/false` (`executeUpdate() > 0`) e o Controller avisa "Registro não encontrado" | os 5 DAOs e controllers, `Conversor.REGISTRO_NAO_ENCONTRADO` |
+| 7 | Remover/atualizar um registro que já não existe dizia "sucesso" | Os DAOs devolvem `true/false` (`executeUpdate() > 0`) e o Controller avisa "Registro não encontrado" | os 5 DAOs e controllers, `Conversor.REGISTRO_NAO_ENCONTRADO` |
 | 8 | Minuto de parada maior que a duração do título era aceito | "O minuto de parada (X) não pode passar da duração do título (Y min)." Séries (sem duração) aceitam qualquer minuto | `HistoricoController.montar` |
 | 9 | Erro de conta vinha sempre com a dica "(e-mail já cadastrado?)" | Código 1062 → "Já existe uma conta com esse e-mail."; 1452 → "O plano escolhido não existe mais."; outros erros mostram a mensagem do banco | `ContaController.mensagemDeErro` |
-| 10 | "Eliminar" sem linha selecionada perguntava "Eliminar o registro?" antes de avisar | Avisa "Selecione um registro" direto | `TelaCrud.confirmarEliminar` |
+| 10 | "Remover" sem linha selecionada perguntava "Remover o registro?" antes de avisar | Avisa "Selecione um registro" direto | `TelaCrud.confirmarEliminar` |
 
 **Como foi testado:** 70 verificações das camadas (todas passaram), as 5 telas, o menu e o relatório, mais 39 verificações novas, uma ou mais para cada correção, incluindo cliques simulados. A do fuso horário rodou em três fusos: São Paulo, UTC e Tóquio.
 

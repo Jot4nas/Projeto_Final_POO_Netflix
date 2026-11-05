@@ -71,13 +71,13 @@ public class ContaController {
             if (!dao.eliminar(Conversor.paraId(id))) {
                 return Conversor.REGISTRO_NAO_ENCONTRADO;
             }
-            return "Conta eliminada com sucesso!";
+            return "Conta removida com sucesso!";
         } catch (IllegalArgumentException e) {
             return e.getMessage();
         } catch (SQLException e) {
             // 1451 = o MySQL recusou porque ha perfis nesta conta (chave estrangeira).
             if (e.getErrorCode() == 1451) {
-                return "Não é possível eliminar esta conta: ela ainda tem perfis. Elimine os perfis antes.";
+                return "Não é possível remover esta conta: ela ainda tem perfis. Remova os perfis antes.";
             }
             return "Erro no banco de dados: " + e.getMessage();
         }

@@ -69,7 +69,7 @@ public class PerfilController {
             if (!dao.eliminar(Conversor.paraId(id))) {
                 return Conversor.REGISTRO_NAO_ENCONTRADO;
             }
-            return "Perfil eliminado com sucesso (o histórico dele também foi apagado).";
+            return "Perfil removido com sucesso (o histórico dele também foi apagado).";
         } catch (IllegalArgumentException e) {
             return e.getMessage();
         } catch (SQLException e) {
